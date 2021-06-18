@@ -16,6 +16,7 @@
 html {
     height: -webkit-fill-available; /* Приходится фиксировать высоту html */
 }
+
 body {
     min-height: 100vh;
     min-height: -webkit-fill-available;
@@ -32,6 +33,7 @@ body {
 html {
     height: 100%;
 }
+
 body {
     min-height: 100%;
 }
@@ -56,6 +58,7 @@ html {
     display: flex;
     flex-direction: column;
 }
+
 body {
     flex-grow: 1;
 }
