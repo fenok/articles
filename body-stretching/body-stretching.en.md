@@ -49,6 +49,8 @@ This solution is not as pretty as the `100vh` one, but it's been used since time
 
 Well... Not quite. Apparently, the gradient set to such a `body` will be cut at the `html` height (in other words, at the viewport height, or, even more precise, at the _minimal_ viewport height).
 
+It happens due to fixed `html` height, and it doesn't matter whether it's `height: 100%` or `height: -webkit-fill-available`.
+
 ![Broken gradient demo](resources/gradient-clip.png)
 
 Of course, this can be "fixed" by setting the gradient to the `body` content, but that's just not _right_. The page background _should_ be set to the `body`, and the `html` _should_ stretch to its content. Can we achieve that?
