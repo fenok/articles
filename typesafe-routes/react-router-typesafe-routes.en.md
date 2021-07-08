@@ -14,8 +14,6 @@ Enter [react-router-typesafe-routes](https://www.npmjs.com/package/react-router-
 
 ### Route definition
 
-It allows defining routes like this:
-
 ```typescript
 const someRoute = route(path("/path/:id"), query(), hash(), state());
 ```
@@ -25,23 +23,23 @@ There are several helpers that process different route parts:
 -   `path` uses [generatePath](https://reactrouter.com/web/api/generatePath) to build parametrized path, which allows usage of any path string that's compatible with react-router. On parse, it performs various checks on the given params object to ensure that it belongs to the given route. By default, it infers path params types from the path string in the same way as [generatePath](https://reactrouter.com/web/api/generatePath) does.
 -   `query` uses [query-string](https://www.npmjs.com/package/query-string), which can be configured, to build and parse query string. By default, it uses the same types for query params as [query-string](https://www.npmjs.com/package/query-string) does.
 -   `hash` just takes care of the `#` symbol on building and parsing hash string. By default, it uses the `string` type.
--   `state` is some ad-hoc helper written by the user. The library doesn't provide a generic helper.
+-   `state` is some ad-hoc helper written by the user. The library doesn't provide a generic helper for route state processing.
 
 As expected, the types can be improved:
 
 ```typescript
 const someRoute = route(
     path("/path/:id(\\d+)?", { id: param.number.optional }),
-    query({ search: param.string.optional("") }),
+    query({ search: param.string.optional("") }), // Use "" as a fallback
     hash("about", "subscribe")
 );
 ```
 
-The `param` helper defines a set of transformers that transform values on building and parsing. The `.optional` modifier means that the value can be `undefined`, and an unsuccessful parsing will use it as a fallback. It's also possible to specify the fallback (`param.string.optional("")`), which should be particularly useful for query params.
+The `param` helper defines a set of transformers that transform values on building and parsing. The `.optional` modifier means that the value can be `undefined`, and an unsuccessful parsing will use it as a fallback. It's also possible to specify the fallback, which should be particularly useful for query params.
 
 Note that query params have to be `.optional` because of their nature. React-router doesn't consider query on route matching, and the app shouldn't break on manual URL changes.
 
-Transformers are very permissive. It's possible to store arrays in query and even in path, and they can be extended by writing custom transformers.
+The transformers are very permissive. It's possible to store arrays in a query and even in a path, and it's possible to write custom transformers.
 
 ### Route usage
 
@@ -49,39 +47,45 @@ Use `Route` components as usual:
 
 ```typescript jsx
 import { Route } from "react-router";
-import { routes } from "./path/to/routes";
+import { someRoute } from "./path/to/routes";
 
-<Route path={routes.PRODUCT.path} />;
+<Route path={someRoute.path} />;
 ```
 
 Use `Link` components as usual:
 
 ```typescript jsx
 import { Link } from "react-router-dom";
-import { routes } from "./path/to/routes";
+import { someRoute } from "./path/to/routes";
 
 // Everything is fully typed!
-<Link to={routes.PRODUCT.build({ id: 1 }, { age: 12 }, "about")} />;
+<Link to={someRoute.build({ id: 1 }, { search: "strawberries" }, "about")} />;
+<Link to={someRoute.buildLocation({ state: "private" }, { id: 1 }, { search: "strawberries" }, "about")} />;
 ```
 
 Parse params with usual hooks:
 
 ```typescript jsx
 import { useParams, useLocation } from "react-router";
-import { routes } from "./path/to/routes";
+import { someRoute } from "./path/to/routes";
 
 // You can use useRouteMatch() instead of useParams()
-const { path, query, hash } = routes.PRODUCT.parse(useParams(), useLocation());
+const { path, query, hash, state } = someRoute.parse(useParams(), useLocation());
 ```
 
-You can also parse only what you need:
+Parse only what you need:
 
 ```typescript jsx
 import { useParams, useLocation } from "react-router";
-import { routes } from "./path/to/routes";
+import { someRoute } from "./path/to/routes";
 
 // Again, you can also use useRouteMatch()
-const path = routes.PRODUCT.parsePath(useParams());
-const query = routes.PRODUCT.parseQuery(useLocation());
-const hash = routes.PRODUCT.parseHash(useLocation());
+const path = someRoute.parsePath(useParams());
+const query = someRoute.parseQuery(useLocation());
+const hash = someRoute.parseHash(useLocation());
+const state = someRoute.parseState(useLocation());
 ```
+
+## Final words
+
+More detailed description is available at the [project page](https://github.com/fenok/react-router-typesafe-routes#readme).
