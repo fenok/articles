@@ -2,15 +2,15 @@
 
 I like my code fully typed. Unfortunately, react-router has always been non-cooperative in providing type safety for route parameters.
 
-It's possible to use [generatePath](https://reactrouter.com/web/api/generatePath) to build path with parameters and have some typing, but it's [not perfect](https://github.com/DefinitelyTyped/DefinitelyTyped/issues/52914). There is no built-in way to build query or hash, let alone type them, and there is no type safety for route state either.
+It's possible to use [generatePath](https://reactrouter.com/web/api/generatePath) to build a path with parameters and have some typing, but it's [not perfect](https://github.com/DefinitelyTyped/DefinitelyTyped/issues/52914). There is no built-in way to build query or hash, let alone type them, and there is no type safety for route state either.
 
 Parsing is even worse. There is no built-in way to parse query or hash, and almost all typing is done by casting, which is error-prone.
 
-There are some libraries that allow type safety, but they are more or less incomplete and restrictive. The best I've seen so far is [typesafe-routes](https://www.npmjs.com/package/typesafe-routes), but it doesn't provide type safety for route state and hash, and it puts restrictions on what paths can be used. For instance, it doesn't support custom regexps for parameters.
+There are some libraries for providing type safety, but they are more or less incomplete and restrictive. The best I've seen so far is [typesafe-routes](https://www.npmjs.com/package/typesafe-routes), but it doesn't provide type safety for route state and hash, and it puts restrictions on what paths can be used. For instance, it doesn't support custom regexps for parameters.
 
 ## The solution
 
-Enter [react-router-typesafe-routes](https://www.npmjs.com/package/react-router-typesafe-routes). It tries to be as comprehensive, extensible and non-restrictive as possible.
+Enter [react-router-typesafe-routes](https://www.npmjs.com/package/react-router-typesafe-routes). It tries to be as comprehensive, extensible, and non-restrictive as possible.
 
 ### Route definition
 
@@ -21,11 +21,11 @@ import { state } from "./path/to/state";
 const someRoute = route(path("/path/:id"), query(), hash(), state());
 ```
 
-There are several helpers that process different route parts:
+There are several helpers for processing different route parts:
 
 -   `path` uses [generatePath](https://reactrouter.com/web/api/generatePath) to build parametrized path, which allows usage of any path string that's compatible with react-router. On parse, it performs various checks on the given params object to ensure that it belongs to the given route. By default, it infers path params types from the path string in the same way as [generatePath](https://reactrouter.com/web/api/generatePath) does.
 -   `query` uses [query-string](https://www.npmjs.com/package/query-string), which can be configured, to build and parse query string. By default, it uses the same types for query params as [query-string](https://www.npmjs.com/package/query-string) does.
--   `hash` just takes care of the `#` symbol on building and parsing hash string. By default, it uses the `string` type.
+-   `hash` just takes care of the `#` symbol on building and parsing a hash string. By default, it uses the `string` type.
 -   `state` is some ad-hoc helper written by the user. The library doesn't provide a generic helper for route state processing.
 
 As expected, the types can be improved:
