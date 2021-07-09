@@ -1,12 +1,12 @@
 # Stretching body to full viewport height: the missing way
 
-So, you're making a sticky footer or centering some content relative to the viewport. You want to stretch the `body` to full browser window height, at the same time allowing it to stretch to its content. No doubt, this task was solved a bazillion of times, and it should be as easy as pie. Right? _Right?_
+Suppose you're making a sticky footer or centering some content relative to the viewport. You want to stretch the `body` to the full height of the browser window, while also letting it stretch to its content. This task was surely solved a bazillion times, and it should be as easy as pie. Right? _Right?_
 
 ## The state-of-the-art way
 
-Sure! Just set `min-height: 100vh` to the `body`. `100vh` is 100% of the viewport height, and using `min-height` instead of `height` does not fix the `body` height, allowing it to grow as necessary. Exactly what we need!
+Sure! Applying `min-height: 100vh` to the `body` should do the trick. `100vh` means that the initial `body` height will take 100% of the viewport height, whereas the use of `min-height` instead of `height` will let the `body` grow even more if necessary. This is exactly what we need!
 
-Well... Almost. Apparently, in a typical mobile browser such a page will always have a scroll, and the bottom of the page will disappear beneath the browser bottom UI panel. Even if the content fits the screen perfectly!
+Well... Almost. It turns out that, in a typical mobile browser, such a page will always be scrollable, and its bottom will disappear beneath the bottom UI panel of the browser. Even if the page content fits the screen perfectly!
 
 The case is that on mobile devices `100vh` is the maximum possible viewport height, but the initial viewport height is usually _smaller_. This happens due to browser UI elements that initially take up some space, but then shrink or disappear on the page scroll.
 
@@ -59,11 +59,10 @@ Of course, this can be "fixed" by setting the gradient to the `body` content, bu
 
 I dare to suggest another way of stretching the `body` to full viewport height that lacks the issues mentioned above. The core idea is that we pass the 100% `html` height via the flexbox, and therefore we are not forced to fix the `html` height.
 
-
 ```css
 html {
     min-height: 100%; /* Look, it's not fixed anymore! */
-    
+
     display: flex;
     flex-direction: column;
 }
@@ -77,6 +76,6 @@ Now the `html` can stretch to its content, and there are no issues with mobile b
 
 ## Notes
 
-* It should be obvious that the flexbox-based height passing works for any depth. It can easily be used in cases where the content is being rendered to some element inside the `body`, and not the `body` itself. It's a typical scenario with [React](https://medium.com/@dan_abramov/two-weird-tricks-that-fix-react-7cf9bbdef375) or [Vue](https://vuejs.org/v2/api/#el), for example.
+-   It should be obvious that the flexbox-based height passing works for any depth. It can easily be used in cases where the content is being rendered to some element inside the `body`, and not the `body` itself. It's a typical scenario with [React](https://medium.com/@dan_abramov/two-weird-tricks-that-fix-react-7cf9bbdef375) or [Vue](https://vuejs.org/v2/api/#el), for example.
 
-* The flexbox-based height passing doesn't work in IE. Not at all. But you don't support it anyway, do you?
+-   The flexbox-based height passing doesn't work in IE. Not at all. But you don't support it anyway, do you?
