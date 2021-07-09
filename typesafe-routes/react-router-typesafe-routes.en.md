@@ -40,11 +40,13 @@ const someRoute = route(
 );
 ```
 
-The `param` helper defines a set of transformers that transform values on building and parsing. The `.optional` modifier means that the value can be `undefined`, and an unsuccessful parsing will use it as a fallback. It's also possible to specify the fallback, which should be particularly useful for query params.
+The `param` helper defines a set of transformers that transform values on building and parsing. The built-in transformers are: `param.string`, `param.number`, `param.boolean`, `param.null`, `param.date`, `param.oneOf()`, `param.arrayOf()`.
 
-Note that query params have to be `.optional` because of their nature. React-router doesn't consider query on route matching, and the app shouldn't break on manual URL changes.
+The `.optional` modifier means that the value can be `undefined`. An unsuccessful parsing of an `.optional` parameter will also result in `undefined`. It's possible to specify the fallback value that will be returned instead of `undefined`, which should be particularly useful for query params.
 
-The transformers are very permissive. It's possible to store arrays in a query and even in a path, and it's possible to write custom transformers.
+Note that query params have to be `.optional` because of their nature. React-router doesn't consider the query part on route matching, and the app shouldn't break on manual URL changes.
+
+The transformers are very permissive. It's possible to (natively!) store arrays in a query and even in a path, and it's possible to write custom transformers for storing any serializable data.
 
 ### Route usage
 
