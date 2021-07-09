@@ -8,7 +8,9 @@ Sure! Applying `min-height: 100vh` to the `body` should do the trick. `100vh` me
 
 Well... Almost. It turns out that, in a typical mobile browser, such a page will always be scrollable, and its bottom will disappear beneath the bottom UI panel of the browser. Even if the page content fits the screen perfectly!
 
-The case is that on mobile devices `100vh` is the maximum possible viewport height, but the initial viewport height is usually _smaller_. This happens due to browser UI elements that initially take up some space, but then shrink or disappear on the page scroll.
+The reason for this is fairly simple. UI elements in mobile browsers tend to shrink after the scroll, leaving more space for the actual content. `100vh` usually corresponds to the _maximum_ possible viewport height, and, since the initial viewport height is usually smaller, the `body` with a `min-height` of `100vh` may initially exceed the screen height regardless of its content.
+
+This is true at least for [iOS Safari](https://bugs.webkit.org/show_bug.cgi?id=141832#c5) and [Android Chrome](https://developers.google.com/web/updates/2016/12/url-bar-resizing).
 
 ![Mobile browser scroll demo](./resources/100vh-scroll.png)
 
