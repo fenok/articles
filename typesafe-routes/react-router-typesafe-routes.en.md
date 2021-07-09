@@ -15,6 +15,9 @@ Enter [react-router-typesafe-routes](https://www.npmjs.com/package/react-router-
 ### Route definition
 
 ```typescript
+import { route, path, query, hash } from "react-router-typesafe-routes";
+import { state } from "./path/to/state";
+
 const someRoute = route(path("/path/:id"), query(), hash(), state());
 ```
 
@@ -28,6 +31,8 @@ There are several helpers that process different route parts:
 As expected, the types can be improved:
 
 ```typescript
+import { route, path, query, hash, param } from "react-router-typesafe-routes";
+
 const someRoute = route(
     path("/path/:id(\\d+)?", { id: param.number.optional }),
     query({ search: param.string.optional("") }), // Use "" as a fallback
@@ -86,6 +91,6 @@ const hash = someRoute.parseHash(useLocation());
 const state = someRoute.parseState(useLocation());
 ```
 
-## Final words
+## Last words
 
-More detailed description is available at the [project page](https://github.com/fenok/react-router-typesafe-routes#readme).
+A more detailed description is available at the [project page](https://github.com/fenok/react-router-typesafe-routes#readme). The library requires battle-testing and has yet to reach version `1.0.0`.
