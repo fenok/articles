@@ -76,7 +76,7 @@ body {
 }
 ```
 
-Now the `html` can stretch to its content, and there are no issues with mobile browsers whatsoever. Neat!
+Now the `html` can stretch to its content, and, since we're using the percentage height, there are no issues with mobile browsers whatsoever. Neat!
 
 ## Notes
 
