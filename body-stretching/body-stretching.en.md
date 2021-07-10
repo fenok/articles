@@ -14,7 +14,7 @@ This is true at least for [iOS Safari](https://bugs.webkit.org/show_bug.cgi?id=1
 
 ![Mobile browser scroll demo](./resources/100vh-scroll.png)
 
-It's possible to google a [fix](https://css-tricks.com/css-fix-for-100vh-in-mobile-webkit/) for that issue that looks like this:
+The known [fix](https://css-tricks.com/css-fix-for-100vh-in-mobile-webkit/) for this issue looks like this:
 
 ```css
 html {
@@ -27,15 +27,17 @@ body {
 }
 ```
 
-It seems that Chrome has a bug where the `body` height can get out of sync with the viewport height on the browser height change. Aside from that, the issue is really solved, but now we have to fix the `html` height. If that's the case, why shouldn't we use an older, more robust solution?
+This solution has a minor glitch: there seems to be a bug in Chrome which makes the `body` height get out of sync with the viewport height when the browser height changes. Aside from that, this approach solves the issue.
+
+However, we now have to fix the `html` height. If that's the case, shouldn't we use an older, more robust solution?
 
 ## The old-school way
 
-We couldn't get rid of fixing the `html` height, so let's try the good old way that involves passing a 100% height from the `html`.
+Since we couldn't avoid fixing the `html` height, let's try the good old way that involves passing a 100% height from the `html`.
 
-Let's set `min-height: 100%` to the `body`, where 100% is the full height of the parent (the `html` element). Percentage height requires the parent to have a fixed height, so we have to set `height: 100%` to the `html`, fixing its height to full viewport height.
+Let's apply `min-height: 100%` to the `body`, where 100% is the full height of its parent (namely, the `html` element). A percentage height on a child requires the parent to have a fixed height, so we have to apply `height: 100%` to the `html`, thereby fixing its height to the full viewport height.
 
-By the way, in case of mobile browsers, percentage height for an `html` is calculated relative to the _minimal_ viewport height, so the scroll issue mentioned above is not present anymore!
+Since the percentage height of an `html` element in mobile browsers is calculated relative to the _minimal_ viewport height, the above-mentioned scroll issue doesn't bug us anymore!
 
 ```css
 html {
@@ -49,9 +51,9 @@ body {
 
 This solution is not as pretty as the `100vh` one, but it's been used since time immemorial, and it will work, that's for sure!
 
-Well... Not quite. Apparently, the gradient set to such a `body` will be cut at the `html` height (in other words, at the viewport height, or, even more precise, at the _minimal_ viewport height).
+Well... Not quite. Apparently, the gradient set to such a `body` will be cut at the `html` height (in other words, at the viewport height, or, to be more precise, at the _minimal_ viewport height).
 
-It happens due to fixed `html` height, and it doesn't matter whether it's `height: 100%` or `height: -webkit-fill-available`.
+It happens because of the fixed `html` height, and it doesn't matter whether it's `height: 100%` or `height: -webkit-fill-available`.
 
 ![Broken gradient demo](resources/gradient-clip.png)
 
@@ -59,7 +61,7 @@ Of course, this can be "fixed" by setting the gradient to the `body` content, bu
 
 ## The missing way
 
-I dare to suggest another way of stretching the `body` to full viewport height that lacks the issues mentioned above. The core idea is that we pass the 100% `html` height via the flexbox, and therefore we are not forced to fix the `html` height.
+I dare to suggest another way of stretching the `body` to the full viewport height that lacks the above-mentioned issues. The core idea is to use flexbox to pass the 100% `html` height, which saves us from having to fix the `html` height.
 
 ```css
 html {
