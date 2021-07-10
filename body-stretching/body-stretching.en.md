@@ -61,7 +61,7 @@ Of course, this can be "fixed" by applying the gradient to the `body` content, b
 
 ## The missing way
 
-I dare to suggest another way of stretching the `body` to the full viewport height that lacks the above-mentioned issues. The core idea is to use flexbox to pass the 100% `html` height, which saves us from having to fix the `html` height.
+I dare to suggest another way of stretching the `body` to the full viewport height that lacks the above-mentioned issues. The core idea is to use flexbox to pass the 100% `html` height, which saves us from having to fix it.
 
 ```css
 html {
