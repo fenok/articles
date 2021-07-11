@@ -4,13 +4,11 @@ Suppose you're making a sticky footer or centering some content relative to the 
 
 ## The state-of-the-art way
 
-Sure! Applying `min-height: 100vh` to the `body` element should do the trick. `100vh` means that the initial `body` height will take 100% of the viewport height, whereas the use of `min-height` instead of `height` will let the `body` element grow even more if necessary. This is exactly what we need!
+Sure! Applying `min-height: 100vh` to the `body` element should do the trick. `100vh` means that the initial `body` height will take 100% of the viewport height, whereas the use of `min-height` instead of `height` will let the `body` element grow even more if necessary. Isn't it exactly what we need?
 
-Well... Almost. It turns out that, in a typical mobile browser, such a page will always be scrollable, and its bottom will disappear beneath the bottom UI panel of the browser. Even if the page content fits the viewport perfectly!
+Well... Almost. If we open such a page in a typical mobile browser (such as [iOS Safari](https://bugs.webkit.org/show_bug.cgi?id=141832#c5) or [Android Chrome](https://developers.google.com/web/updates/2016/12/url-bar-resizing)), it will be scrollable regardless of the size of its content. Even if the page has no content at all, its bottom will still disappear beneath the bottom UI panel of the browser!
 
-The reason for this is fairly simple. UI elements in mobile browsers tend to shrink after the scroll, leaving more space for the actual content. `100vh` usually corresponds to the _maximum_ possible viewport height, and, since the initial viewport height is usually smaller, the `body` element with a `min-height` of `100vh` may initially exceed the viewport height regardless of its content.
-
-This is true at least for [iOS Safari](https://bugs.webkit.org/show_bug.cgi?id=141832#c5) and [Android Chrome](https://developers.google.com/web/updates/2016/12/url-bar-resizing).
+The reason for this is fairly simple. UI elements in these browsers shrink after the scroll, providing additional space for the actual content. A height of `100vh` corresponds to the _maximum_ possible viewport height. Since the initial viewport height is smaller, the `body` element with a `min-height` of `100vh` initially exceeds the viewport height regardless of its content.
 
 ![Mobile browser scroll demo](./resources/100vh-scroll.png)
 
@@ -27,17 +25,17 @@ body {
 }
 ```
 
-This solution has a minor glitch: there seems to be a bug in Chrome which makes the `body` height get out of sync with the viewport height when the browser height changes. Aside from that, this approach solves the issue.
+This solution has a minor glitch in Chrome: when the browser height increases, the `body` height stays the same, getting out of sync with the viewport height. Aside from that, this approach solves the issue.
 
 However, we now have to fix the `html` height. If that's the case, shouldn't we use an older, more robust solution?
 
 ## The old-school way
 
-Since we couldn't avoid fixing the `html` height, let's try the good old way that involves passing a 100% height from the `html` element.
+Since we couldn't avoid fixing the `html` height, let's try the good old way that involves passing a height of 100% from the `html` element.
 
-Let's apply `min-height: 100%` to the `body` element, where 100% is the full height of its parent (namely, the `html` element). A percentage height on a child requires the parent to have a fixed height, so we have to apply `height: 100%` to the `html` element, thereby fixing its height to the full viewport height.
+Let's apply `min-height: 100%` to the `body` element, where 100% is the full height of its parent (namely, the `html` element). A percentage height on a child requires its parent to have a fixed height, so we have to apply `height: 100%` to the `html` element, thereby fixing its height to the full viewport height.
 
-Since the percentage height of an `html` element in mobile browsers is calculated relative to the _minimal_ viewport height, the above-mentioned scroll issue doesn't bug us anymore!
+Since the percentage height of the `html` element in mobile browsers is calculated relative to the _minimal_ viewport height, the above-mentioned scroll issue doesn't bug us anymore!
 
 ```css
 html {
@@ -80,6 +78,6 @@ Now the `html` element can stretch to its content, and, since we're using the pe
 
 ## Notes
 
--   It should be obvious that the flexbox-based height passing works for any depth. It can easily be used in cases where the content is being rendered to some element inside the `body`, and not the `body` element itself. It's a typical scenario with [React](https://medium.com/@dan_abramov/two-weird-tricks-that-fix-react-7cf9bbdef375) or [Vue](https://vuejs.org/v2/api/#el), for example.
+-   It should be obvious that the flexbox-based height passing works for any depth. It can easily be used in cases where the content is being rendered to an element inside the `body`, and not the `body` element itself. It's a typical scenario with [React](https://medium.com/@dan_abramov/two-weird-tricks-that-fix-react-7cf9bbdef375) or [Vue](https://vuejs.org/v2/api/#el), for example.
 
 -   The flexbox-based height passing doesn't work in IE. Not at all. But you don't support it anyway, do you?
