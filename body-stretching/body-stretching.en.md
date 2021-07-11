@@ -59,11 +59,13 @@ Of course, this can be "fixed" by applying the gradient to the `body` content, b
 
 ## The missing way
 
-I dare to suggest another way of stretching the `body` element to the full viewport height without the above-mentioned issues. The core idea is to use flexbox, which allows a child element to stretch to its parent dimensions even if these dimensions aren't fixed.
+I dare to suggest another way of stretching the `body` element to the full viewport height without the above-mentioned issues. The core idea is to use flexbox, which allows a child element to stretch to its parent dimensions even if these dimensions aren't fixed, without losing the ability to grow by content.
 
-We apply `min-height: 100%` to the `html` element, stretching it to the full _minimal_ viewport height and letting it grow even further as necessary. We then apply `display: flex` and `flex-direction: column` to it, making it a flex-container with vertical main axis. Finally, we apply `flex-grow: 1` to the `body` element, stretching it to the `html` height.
+We apply `min-height: 100%` to the `html` element, stretching it to the full _minimal_ viewport height and letting it grow even further as necessary. We then apply `display: flex` and `flex-direction: column` to it, making it a flex-container with vertical main axis. Finally, we apply `flex-grow: 1` to the `body` element, stretching it to the `html` height and letting it grow with its content as well.
 
 The `align-self` property of the `body` element implicitly has the `stretch` value, so the `body` width already matches the `html` width.
+
+As you might've noticed, the direction of the main axis of the flex-container shouldn't matter. I just think that the vertical axis is more aesthetic in this case, and I didn't really test the other variant. I don't see how it can possibly break, but who knows.
 
 ```css
 html {
