@@ -1,6 +1,6 @@
 # Stretching body to full viewport height: the missing way
 
-Suppose you're making a sticky footer or centering some content relative to the viewport. You want to stretch the `body` to the full height of the browser window, while also letting it stretch even further, depending on its content. This task was surely solved a bazillion times, and it should be as easy as pie. Right? _Right?_
+Suppose you're making a sticky footer or centering some content relative to the viewport. You want to stretch the `body` to the full height of the browser window while also letting it grow even further to match its content. This task was surely solved a bazillion times, and it should be as easy as pie. Right? _Right?_
 
 ## The state-of-the-art way
 
