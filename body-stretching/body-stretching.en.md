@@ -6,9 +6,9 @@ Suppose you're making a sticky footer or centering some content relative to the 
 
 Sure! Applying `min-height: 100vh` to the `body` should do the trick. `100vh` means that the initial `body` height will take 100% of the viewport height, whereas the use of `min-height` instead of `height` will let the `body` grow even more if necessary. This is exactly what we need!
 
-Well... Almost. It turns out that, in a typical mobile browser, such a page will always be scrollable, and its bottom will disappear beneath the bottom UI panel of the browser. Even if the page content fits the screen perfectly!
+Well... Almost. It turns out that, in a typical mobile browser, such a page will always be scrollable, and its bottom will disappear beneath the bottom UI panel of the browser. Even if the page content fits the viewport perfectly!
 
-The reason for this is fairly simple. UI elements in mobile browsers tend to shrink after the scroll, leaving more space for the actual content. `100vh` usually corresponds to the _maximum_ possible viewport height, and, since the initial viewport height is usually smaller, the `body` with a `min-height` of `100vh` may initially exceed the screen height regardless of its content.
+The reason for this is fairly simple. UI elements in mobile browsers tend to shrink after the scroll, leaving more space for the actual content. `100vh` usually corresponds to the _maximum_ possible viewport height, and, since the initial viewport height is usually smaller, the `body` with a `min-height` of `100vh` may initially exceed the viewport height regardless of its content.
 
 This is true at least for [iOS Safari](https://bugs.webkit.org/show_bug.cgi?id=141832#c5) and [Android Chrome](https://developers.google.com/web/updates/2016/12/url-bar-resizing).
 
