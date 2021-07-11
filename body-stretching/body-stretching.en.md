@@ -4,7 +4,7 @@ Suppose you're making a sticky footer or centering some content relative to the 
 
 ## The state-of-the-art way
 
-Sure! Applying `min-height: 100vh` to the `body` element should do the trick. `100vh` means that the initial `body` height will take 100% of the viewport height, whereas the use of `min-height` instead of `height` will let the `body` element grow even more if necessary. Isn't it exactly what we need?
+Sure! Applying `min-height: 100vh` to the `body` element should do the trick. Here, `100vh` means that the initial `body` height will take 100% of the viewport height, whereas the use of `min-height` instead of `height` will let the `body` element grow even more if necessary. Isn't it exactly what we need?
 
 Well... Almost. If we open such a page in a typical mobile browser (such as [iOS Safari](https://bugs.webkit.org/show_bug.cgi?id=141832#c5) or [Android Chrome](https://developers.google.com/web/updates/2016/12/url-bar-resizing)), it will be scrollable regardless of the size of its content. Even if the page has no content at all, its bottom will still disappear beneath the bottom UI panel of the browser!
 
@@ -33,7 +33,7 @@ However, we now have to fix the `html` height. If that's the case, shouldn't we 
 
 Since we couldn't avoid fixing the `html` height, let's try the good old way that involves passing a height of 100% from the `html` element.
 
-Let's apply `min-height: 100%` to the `body` element, where 100% is the full height of its parent (namely, the `html` element). A percentage height on a child requires its parent to have a fixed height, so we have to apply `height: 100%` to the `html` element, thereby fixing its height to the full viewport height.
+Let's apply `min-height: 100%` to the `body` element, where 100% is the full height of its parent (namely, `html`). A percentage height on a child requires its parent to have a fixed height, so we have to apply `height: 100%` to the `html` element, thereby fixing its height to the full viewport height.
 
 Since the percentage height of the `html` element in mobile browsers is calculated relative to the _minimal_ viewport height, the above-mentioned scroll issue doesn't bug us anymore!
 
@@ -61,7 +61,7 @@ Of course, this can be "fixed" by applying the gradient to the `body` content, b
 
 I dare to suggest another way of stretching the `body` element to the full viewport height without the above-mentioned issues.
 
-The core idea is to use flexbox, which allows a child element to grow to its parent height without fixing it. Thereby, we can use `min-height` instead of `height` on the `html` element.
+The core idea is to use flexbox, which allows a child element to grow to its parent height even if the parent height is not fixed. Thereby, we can use `min-height` instead of `height` on the `html` element.
 
 ```css
 html {
