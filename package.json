@@ -1,7 +1,11 @@
 {
   "name": "articles",
   "dependencies": {
+    "node-static": "^0.7.11",
     "prettier": "^2.3.2"
   },
-  "private": true
+  "private": true,
+  "scripts": {
+    "static": "static -H '{\"Cache-Control\": \"no-cache, must-revalidate\"}' -a 0.0.0.0"
+  }
 }

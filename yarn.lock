@@ -9,9 +9,56 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "articles@workspace:."
   dependencies:
+    node-static: ^0.7.11
     prettier: ^2.3.2
   languageName: unknown
   linkType: soft
+
+"colors@npm:>=0.6.0":
+  version: 1.4.0
+  resolution: "colors@npm:1.4.0"
+  checksum: a0f266ac041a9774d92cc9624a984707678d2eeec125d54e8d8231075ce36c24c5352fb5d0f90c6ee420d0f63e354417cec716386ad341309334aad18e32b933
+  languageName: node
+  linkType: hard
+
+"mime@npm:^1.2.9":
+  version: 1.6.0
+  resolution: "mime@npm:1.6.0"
+  bin:
+    mime: cli.js
+  checksum: d540c24dd3e3a9e25e813714e55ff2f7841a3a1a47aed9786c508bd0251653d5e9abbfb1163c0c6e1be99f872d7fa1538c068bd6e306e9cb12dd9affa841a61e
+  languageName: node
+  linkType: hard
+
+"minimist@npm:~0.0.1":
+  version: 0.0.10
+  resolution: "minimist@npm:0.0.10"
+  checksum: 2e45f013789db167eaffc5954531cd6adc9d1bcf86498b1a1de87f8aa4a3bb8ff393226107046a3e681e04e3ca8997156c9d7cf3a03a223ed5b535ae71d2e66e
+  languageName: node
+  linkType: hard
+
+"node-static@npm:^0.7.11":
+  version: 0.7.11
+  resolution: "node-static@npm:0.7.11"
+  dependencies:
+    colors: ">=0.6.0"
+    mime: ^1.2.9
+    optimist: ">=0.3.4"
+  bin:
+    static: bin/cli.js
+  checksum: 30ff2619845b5f19b8c79beee6f196afa3c80efc83093cb60bde37ba641cb8abb31e0717fe4f2b395e82aa707425ad23b849adc2f53b048f4879ee4ace717956
+  languageName: node
+  linkType: hard
+
+"optimist@npm:>=0.3.4":
+  version: 0.6.1
+  resolution: "optimist@npm:0.6.1"
+  dependencies:
+    minimist: ~0.0.1
+    wordwrap: ~0.0.2
+  checksum: 14cb755f3864ce3459219e1c6a7cd043c7de14f0e6ec5acfc774728e9974a50ae153ebebfcf8a3d38f7bf273e120c6aae735b99d17377fa2c2e867df33402c16
+  languageName: node
+  linkType: hard
 
 "prettier@npm:^2.3.2":
   version: 2.3.2
@@ -19,5 +66,12 @@ __metadata:
   bin:
     prettier: bin-prettier.js
   checksum: 4fd89a7f6a12b13456d359fba2b1dd0fc0a17cf33f8f15953ab9f43b21ea9b09b5a2861d63b558ca0577274ce606d390e70628cf93e26d19d6cb7f19c9eebc31
+  languageName: node
+  linkType: hard
+
+"wordwrap@npm:~0.0.2":
+  version: 0.0.3
+  resolution: "wordwrap@npm:0.0.3"
+  checksum: e8c84baa721bd7bc13a88e52e1bc25dd4d14accedafe04d24fbc400ba74ae6d620ac4eff5425d5cab342d1ff43f74396272492039b7d7a804bffd2039a153ff0
   languageName: node
   linkType: hard
