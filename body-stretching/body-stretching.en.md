@@ -59,7 +59,9 @@ Of course, this can be "fixed" by applying the gradient to the `body` content, b
 
 ## The missing way
 
-I dare to suggest another way of stretching the `body` element to the full viewport height that lacks the above-mentioned issues. The core idea is to use flexbox to pass the 100% `html` height, which saves us from having to fix it.
+I dare to suggest another way of stretching the `body` element to the full viewport height without the above-mentioned issues.
+
+The core idea is to use flexbox, which allows a child element to grow to its parent height without fixing it. Thereby, we can use `min-height` instead of `height` on the `html` element.
 
 ```css
 html {
