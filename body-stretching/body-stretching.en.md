@@ -65,8 +65,6 @@ We apply `min-height: 100%` to the `html` element, stretching it to the full _mi
 
 The `align-self` property of the `body` element implicitly has the `stretch` value, so the `body` width already matches the `html` width.
 
-As you might've noticed, the direction of the main axis of the flex-container shouldn't matter. I just think that the vertical axis is more aesthetic in this case, and I didn't really test the other variant. I don't see how it can possibly break, but who knows.
-
 ```css
 html {
     min-height: 100%; /* Look, it's not fixed anymore! */
@@ -84,6 +82,8 @@ Now both `html` and `body` elements can stretch to their content, and, since we'
 
 ## Notes
 
--   It should be obvious that the flexbox-based height passing works for any depth. It can easily be used in cases where the content is being rendered to an element inside the `body`, and not the `body` element itself. It's a typical scenario with [React](https://medium.com/@dan_abramov/two-weird-tricks-that-fix-react-7cf9bbdef375) or [Vue](https://vuejs.org/v2/api/#el), for example.
+-   It should be obvious that the flexbox-based solution works for any depth. It can easily be used in cases where the content is being rendered to an element inside the `body`, and not the `body` element itself. It's a typical scenario with [React](https://medium.com/@dan_abramov/two-weird-tricks-that-fix-react-7cf9bbdef375) or [Vue](https://vuejs.org/v2/api/#el), for example.
 
--   The flexbox-based height passing doesn't work in IE. Not at all. But you don't support it anyway, do you?
+-   As you might've noticed, the direction of the main axis of the flex-container shouldn't matter. I just think that the vertical axis is more aesthetic in this case, and I didn't really test the other variant. I don't see how it can possibly break, but who knows.
+
+-   The flexbox-based solution doesn't work in IE. Not at all. But you don't support it anyway, do you?
