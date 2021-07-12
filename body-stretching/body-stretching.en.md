@@ -59,7 +59,7 @@ Of course, this can be "fixed" by applying the gradient to the `body` content, b
 
 ## The missing way
 
-I dare to suggest another way of stretching the `body` element to the full viewport height without the above-mentioned issues. The core idea is to use flexbox, which allows a child element to stretch to its parent dimensions even if these dimensions aren't fixed, without losing the ability to stretch to its content.
+I dare to suggest another way of stretching the `body` element to the full viewport height without the above-mentioned issues. The core idea is to use flexbox, which allows a child element to stretch to its parent dimensions even if these dimensions aren't fixed, without losing the ability to grow further.
 
 We apply `min-height: 100%` to the `html` element, stretching it to the full _minimal_ viewport height and letting it grow even further as necessary. We then apply `display: flex` and `flex-direction: column` to it, making it a flex-container with vertical main axis. Finally, we apply `flex-grow: 1` to the `body` element, stretching it to the `html` height and letting it grow with its content as well.
 
@@ -80,7 +80,7 @@ body {
 }
 ```
 
-Now the `html` element (as well as the `body` element) can stretch to its content, and, since we're using the percentage height, there are no issues with mobile browsers whatsoever. Neat!
+Now both `html` and `body` elements can stretch to their content, and, since we're using the percentage height, there are no issues with mobile browsers whatsoever. Neat!
 
 ## Notes
 
