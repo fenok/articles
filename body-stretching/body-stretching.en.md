@@ -59,9 +59,9 @@ Of course, this can be "fixed" by applying the gradient to the `body` content, b
 
 ## The missing way
 
-I dare to suggest another way of stretching the `body` element to the full viewport height without the above-mentioned issues. The core idea is to use flexbox, which allows a child element to stretch to its parent dimensions even if these dimensions aren't fixed, without losing the ability to grow further.
+I suggest another way of stretching the `body` element to the full viewport height without the above-mentioned issues. The core idea is to use flexbox, which enables a child element to stretch even to a parent with non-fixed dimensions while retaining the ability to grow further.
 
-We apply `min-height: 100%` to the `html` element, stretching it to the full _minimal_ viewport height and letting it grow even further as necessary. We then apply `display: flex` and `flex-direction: column` to it, making it a flex-container with vertical main axis. Finally, we apply `flex-grow: 1` to the `body` element, stretching it to the `html` height and letting it grow with its content as well.
+First, we apply `min-height: 100%` to the `html` element to stretch it to the full _minimal_ viewport height. Then we use `display: flex` and `flex-direction: column` to turn it into a flex-container with a vertical main axis. Finally, we apply `flex-grow: 1` to the `body` element, thereby stretching it to the `html` height.
 
 The `align-self` property of the `body` element implicitly has the `stretch` value, so the `body` width already matches the `html` width.
 
@@ -78,12 +78,12 @@ body {
 }
 ```
 
-Now both `html` and `body` elements can stretch to their content, and, since we're using the percentage height, there are no issues with mobile browsers whatsoever. Neat!
+Now both `html` and `body` can stretch to their content, and, since we're using the percentage height, there are no issues with mobile browsers whatsoever. Neat!
 
 ## Notes
 
 -   It should be obvious that the flexbox-based solution works for any depth. It can easily be used in cases where the content is being rendered to an element inside the `body`, and not the `body` element itself. It's a typical scenario with [React](https://medium.com/@dan_abramov/two-weird-tricks-that-fix-react-7cf9bbdef375) or [Vue](https://vuejs.org/v2/api/#el), for example.
 
--   As you might've noticed, the direction of the main axis of the flex-container shouldn't matter. I just think that the vertical axis is more aesthetic in this case, and I didn't really test the other variant. I don't see how it can possibly break, but who knows.
+-   As you might've noticed, the direction of the main axis of the flex-container shouldn't matter. I just think that the vertical axis is more elegant in this case, and I didn't really test the other variant. I don't see how it can possibly break, but who knows.
 
 -   The flexbox-based solution doesn't work in IE. Not at all. But you don't support it anyway, do you?
