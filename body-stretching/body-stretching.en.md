@@ -1,3 +1,5 @@
+![Cover](resources/cover.webp)
+
 # Stretching body to full viewport height: the missing way
 
 Suppose you're making a sticky footer or centering some content relative to the viewport. You want to stretch the `body` element to the full height of the browser viewport while also letting it grow even further to match its content. This task was surely solved a bazillion times, and it should be as easy as pie. Right? _Right?_
