@@ -1,12 +1,12 @@
 # My solution for react-router type safety
 
-I like my code fully typed. Unfortunately, react-router has always been non-cooperative in providing type safety for route parameters.
+I like my code fully typed. Unfortunately, type safety for route parameters has never been a strong suit of react-router.
 
-It's possible to use [generatePath](https://reactrouter.com/web/api/generatePath) to build a path with parameters and have some typing, but it's [not perfect](https://github.com/DefinitelyTyped/DefinitelyTyped/issues/52914). There is no built-in way to build query or hash, let alone type them, and there is no type safety for route state either.
+If all you need is to build a path with parameters, the use of [generatePath](https://reactrouter.com/web/api/generatePath) will give you some typing, albeit [not perfect](https://github.com/DefinitelyTyped/DefinitelyTyped/issues/52914). However, there is no built-in way to build a query or a hash, let alone type them, and there is no type safety for a route state either.
 
-Parsing is even worse. There is no built-in way to parse query or hash, and almost all typing is done by casting, which is error-prone.
+Things get even worse when it comes to parsing. There is no built-in way to parse a query or a hash, and all typing is almost exclusively done by casting, which is error-prone.
 
-There are some libraries for providing type safety, but they are more or less incomplete and restrictive. The best I've seen so far is [typesafe-routes](https://www.npmjs.com/package/typesafe-routes), but it doesn't provide type safety for route state and hash, and it puts restrictions on what paths can be used. For instance, it doesn't support custom regexps for parameters.
+There are some libraries for providing this type safety, but they are more or less incomplete and restrictive. The best I've seen so far is [typesafe-routes](https://www.npmjs.com/package/typesafe-routes), but it offers no type safety for a route state and a hash, and it puts restrictions on what paths can be used. For instance, it doesn't support custom regexps for parameters.
 
 ## The solution
 
@@ -21,12 +21,12 @@ import { state } from "./path/to/state";
 const someRoute = route(path("/path/:id"), query(), hash(), state());
 ```
 
-There are several helpers for processing different route parts:
+There are several helpers for processing different parts of a route:
 
--   `path` uses [generatePath](https://reactrouter.com/web/api/generatePath) to build parametrized path, which allows usage of any path string that's compatible with react-router. On parse, it performs various checks on the given params object to ensure that it belongs to the given route. By default, it infers path params types from the path string in the same way as [generatePath](https://reactrouter.com/web/api/generatePath) does.
--   `query` uses [query-string](https://www.npmjs.com/package/query-string), which can be configured, to build and parse query string. By default, it uses the same types for query params as [query-string](https://www.npmjs.com/package/query-string) does.
--   `hash` just takes care of the `#` symbol on building and parsing a hash string. By default, it uses the `string` type.
--   `state` is some ad-hoc helper written by the user. The library doesn't provide a generic helper for route state processing.
+-   `path` uses [generatePath](https://reactrouter.com/web/api/generatePath) to build a path string, making it possible to use any path template that's compatible with react-router. When it comes to parsing, react-router extracts params from a path string, and `path` performs various checks on these params to ensure that they belong to the specified path template. By default, `path` infers types of path params from a path template in the same way as [generatePath](https://reactrouter.com/web/api/generatePath) does.
+-   `query` uses (configurable!) [query-string](https://www.npmjs.com/package/query-string) to build and parse a query string. By default, `query` uses the same types for query params as [query-string](https://www.npmjs.com/package/query-string) does.
+-   `hash` just takes care of the `#` symbol while building and parsing a hash string. By default, `hash` uses the `string` type for a hash.
+-   `state` is an ad-hoc helper written by the user. The library doesn't provide a generic helper for route state processing.
 
 As expected, the types can be improved:
 
@@ -40,11 +40,11 @@ const someRoute = route(
 );
 ```
 
-The `param` helper defines a set of transformers that transform values on building and parsing. The built-in transformers are: `param.string`, `param.number`, `param.boolean`, `param.null`, `param.date`, `param.oneOf()`, `param.arrayOf()`.
+The `param` helper defines a set of transformers that transform values while building and parsing. The built-in transformers are `param.string`, `param.number`, `param.boolean`, `param.null`, `param.date`, `param.oneOf()`, and `param.arrayOf()`.
 
-The `.optional` modifier means that the value can be `undefined`. An unsuccessful parsing of an `.optional` parameter will also result in `undefined`. It's possible to specify the fallback value that will be returned instead of `undefined`, which should be particularly useful for query params.
+The `optional` modifier means that the corresponding value can be `undefined`. An unsuccessful parsing of an `optional` parameter will also result in `undefined`. It's possible to specify a fallback value that will be returned instead of `undefined`. This should be particularly useful for query params.
 
-Note that query params have to be `.optional` because of their nature. React-router doesn't consider the query part on route matching, and the app shouldn't break on manual URL changes.
+Note that query params are `optional` by their nature. React-router doesn't consider the query part on route matching, and the app shouldn't break in case of manual URL changes.
 
 The transformers are very permissive. It's possible to (natively!) store arrays in a query and even in a path, and it's possible to write custom transformers for storing any serializable data.
 
@@ -93,6 +93,6 @@ const hash = someRoute.parseHash(useLocation());
 const state = someRoute.parseState(useLocation());
 ```
 
-## Last words
+## Notes
 
 A more detailed description is available at the [project page](https://github.com/fenok/react-router-typesafe-routes#readme). The library requires battle-testing and has yet to reach version `1.0.0`.
