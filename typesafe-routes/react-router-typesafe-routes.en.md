@@ -1,3 +1,5 @@
+![Cover](resources/cover.png)
+
 # My solution for react-router type safety
 
 I like my code fully typed. Unfortunately, type safety for route parameters has never been a strong suit of react-router.
