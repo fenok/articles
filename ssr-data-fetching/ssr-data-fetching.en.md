@@ -1,40 +1,48 @@
 # Server-Side Data Fetching in React
 
+This is my understanding of what methods are available for server-side data fetching in React today, what their pros and cons are, how they play with client-side data fetching methods, and how they relate to upcoming Suspense for Data Fetching.
+
 ## TL;DR
 
-|                                                      | Fetch-Then-Render                                                                                                             | Fetch-on-Render                                                                                                                                                                                   |
-| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Fetching start time                                  | ✔️ Fetching is started as soon as possible.                                                                                   | ❌ Fetching is delayed until render.                                                                                                                                                              |
-| Fetching waterfalls                                  | ✔️ No fetching waterfalls.                                                                                                    | ❌ Waterfalls are very possible.                                                                                                                                                                  |
-| Number of server-side renders (without Suspense)     | ✔️ Only one render on the server side.                                                                                        | ❌ Multiple renders required to guarantee that all data is fetched.                                                                                                                               |
-| Compatibility with React 18 Suspense (single render) | ✔️It's the recommended approach.                                                                                              | ✔️Will likely be supported too, but there have to be a [way](https://github.com/reactwg/react-18/discussions/35#discussioncomment-823980) to preserve requests between suspense-caused rerenders. |
-| Isomorphism                                          | ❌ Server-side fetching logic is separate from the client-side one.                                                           | ✔️ The fetching code is isomorphic, there is no SSR-specific code.                                                                                                                                |
-| Access to React-specific data                        | ❌ SSR fetching is done outside of React. There is no access to props, so there has to be a separate URL parser, for example. | ✔️ Since the fetching is done during render, there is access to props and everything else.                                                                                                        |
-| Used by                                              | Next.js.                                                                                                                      | Apollo.                                                                                                                                                                                           |
+|                                                  | Fetch-Then-Render / Render-as-You-Fetch (client-side only)                                                                                                                                                                     | Fetch-on-Render                                                                                                |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Fetching start time                              | ✔️ Fetching is started as soon as possible.                                                                                                                                                                                    | ❌ Fetching is delayed until render.                                                                           |
+| Fetching waterfalls                              | ✔️ Waterfalls can only be created explicitly.                                                                                                                                                                                  | ❌ It's possible to accidentally create a waterfall.                                                           |
+| Number of server-side renders (without Suspense) | ✔️ Single render.                                                                                                                                                                                                              | ❌ Multiple renders required to guarantee that all data is fetched.                                            |
+| Compatibility with Suspense for Data Fetching    | ✔️The recommended approach is Render-as-You-Fetch (for client and server sides).                                                                                                                                               | ✔️Will likely be supported [too](https://github.com/reactwg/react-18/discussions/35#discussioncomment-823980). |
+| Fetching logic encapsulation                     | ❌ Fetching is split in two pieces of code: initial fetching before render, outside of React (server-side and _maybe_ client-side), and fetching in response to user actions or other events, inside React (client-side only). | ✔️ It's easy to encapsulate both client- and server-side code in a single hook.                                |
+| Access to React-specific data                    | ❌ Initial fetching is done outside of React. There is no access to props, so there has to be a separate URL parser, for example.                                                                                              | ✔️ Since fetching is always done during render, there is access to props and everything else.                  |
+| Used by                                          | Next.js.                                                                                                                                                                                                                       | Apollo.                                                                                                        |
 
 ## Introduction
 
-The main problem during SSR is to know when all the data is fetched. In React, the data can be fetched either during the render phase, or prior to it. Fetching after the render phase is impossible (and makes little sense), since the server only cares about rendering and not about committing, executing side effects, etc.
+In React, there are the following fetching strategies:
 
-### Fetch-on-Render (oversimplified) example
+-   Fetch-on-Render: fetching is a result of render. On server side, fetching is triggered at the render phase, because side effects are ignored. On client side, it's better to trigger fetching asynchronously _after_ the render phase via the `useEffect` hook. This way, fetching can be started without blocking rendering.
+-   Fetch-Then-Render: trigger fetching, wait for its completion, and only then start rendering. This way, when a component renders, it's data is already there.
+-   Render-as-You-Fetch: basically the same as Fetch-Then-Render, but we start rendering while fetching is still in progress. This method is ideal for Suspense for Data Fetching, but, from my understanding, it can be used without Suspense as well. Render-as-You-Fetch is practically useless on server side without Suspense, because, as of React 17, the render phase is synchronous, and it's more efficient to wait for the data first (Fetch-Then-Render). However, on client side, Render-as-You-Fetch may be better for UX, because it's possible to show a component in a loading state instead of a plain preloader above it (it's unclear how to achieve this using Suspense).
+
+It goes without saying that fetching strategies can differ between client and server environments. For instance, consider React Query in conjunction with Next.js. On server side, Fetch-Then-Render is used, because that's how Next.js operates. On client side, Fetch-on-Render is used, because that's how React Query works. Additionally, on client side, React Query allows starting fetching early via [Prefetching](https://react-query.tanstack.com/guides/prefetching), which basically enables the Render-as-You-Fetch method even without Suspense.
+
+The following examples give a rough idea of what the Fetch-on-Render and Fetch-Then-Render methods look like both on server and client sides. Render-as-You-Fetch is not shown, because, again, it's just Fetch-Then-Render, but we render while fetching is still in progress.
+
+### Fetch-on-Render
 
 ```typescript jsx
-// Server-side, express middleware
+// Server-side part. Express middleware.
 async function ssrMiddleware(_, res) {
-    // Request-specific store for our data
+    // Request-specific store for our data.
     const store = {};
 
     const app = createElement(App, { store });
 
-    // We can disable data prefetch to illustrate client-side fetching
+    // Server-side fetching can be disabled.
     if (process.env.PREFETCH) {
-        // This helper renders the app over and over and waits for returned promises.
-        // Resolves when no more promises returned.
-        // Which means that all requests were made and all data is in store.
+        // Render the app (possibly multiple times) and wait for registered promises.
         await getDataFromTree(app);
     }
 
-    // Store is sent with the HTML
+    // Render the final variant of the app and send it alongside the store.
     res.send(
         `<!doctype html>
         <body>
@@ -45,62 +53,72 @@ async function ssrMiddleware(_, res) {
     );
 }
 
-// Client-side, pickup store from SSR
+// Client-side part. Hydrate the recieved markup with the store from SSR.
 hydrate(createElement(App, { store: window.STORE }), document.getElementById("root"));
 
-// Isomorphic App
+// Isomorphic App component.
 const App = ({ store }) => {
     const user = useQuery(store, "user", fetchUser);
 
     return <div>{user ? user.name : "Loading..."}</div>;
 };
 
-// Helper for fetching data, both client- and server-side
+// Hook for fetching on both client and server sides.
 function useQuery(store, fieldName, fetchFn) {
-    // Provided by the getDataFromTree() helper via React Context
-    // Non-existent on the client side
+    // Server-side only helper provided by the getDataFromTree utility.
     const ssrManager = useSsrManager();
 
     // Helper for forcing component update.
     const forceUpdate = useForceUpdate();
 
     if (ssrManager && !store[fieldName]) {
-        // If server-side and no data, fetch it and add the promise to the manager.
-        // This way, the getDataFromTree() can wait for the request to complete.
+        // If no data on server side, fetch it and register the promise.
         ssrManager.add(
-            fetchFn.then((data) => {
+            fetchFn().then((data) => {
                 store[fieldName] = data;
             })
         );
     }
 
-    // Client-side only.
-    // If no data, fetch it and force component update to display it.
-    // There will be no data, if the getDataFromTree() helper wasn't used.
+    // If no data on client side, fetch it and force component update to display it.
     useEffect(() => {
+        const cancelled = false;
+
         if (!store[fieldName]) {
-            fetchFn.then((data) => {
-                store[fieldName] = data;
-                forceUpdate();
+            fetchFn().then((data) => {
+                if (!cancelled) {
+                    store[fieldName] = data;
+                    forceUpdate();
+                }
             });
         }
+
+        return () => {
+            cancelled = true;
+        };
     });
 
     return store[fieldName];
 }
 ```
 
-### Fetch-Then-Render (oversimplified) example
+### Fetch-Then-Render
 
 ```typescript jsx
-// Server-side, express middleware
+// Server-side part. Express middleware.
 async function ssrMiddleware(_, res) {
-    // We can disable data prefetch to illustrate client-side fetching
-    const store = process.env.PREFETCH ? await App.prefetch() : {};
+    // Request-specific store for our data.
+    const store = {};
+
+    // Server-side fetching can be disabled.
+    if (process.env.PREFETCH) {
+        // Fill the store with data.
+        await App.prefetch(store);
+    }
 
     const app = createElement(App, { store });
 
-    // Store is sent with the HTML
+    // Render the first and final variant of the app and send it alongside the store.
     res.send(
         `<!doctype html>
         <body>
@@ -111,41 +129,49 @@ async function ssrMiddleware(_, res) {
     );
 }
 
-// Client-side, pickup store from SSR
-hydrate(createElement(App, { store: window.STORE }), document.getElementById("root"));
+// Client-side part. Hydrate the recieved markup with the store from SSR, enriched by cleint-side prefetch.
+hydrate(createElement(App, { store: await App.prefetch(window.STORE) }), document.getElementById("root"));
 
-// Isomorphic App
+// Isomorphic App component.
 const App = ({ store }) => {
-    const user = useQuery(store, "user", fetchUser);
+    const user = useRefetchingQuery(store, "user", fetchUser);
 
     return <div>{user ? user.name : "Loading..."}</div>;
 };
 
-App.prefetch = async () => {
-    // Request-specific store for our data
-    const store = {};
-
-    // We explicitly prefetch some data.
-    store.user = await fetchUser();
+// Function for initial fetching.
+App.prefetch = async (store) => {
+    if (!store.user) {
+        // We explicitly prefetch some data.
+        store.user = await fetchUser();
+    }
 
     return store;
 };
 
-// Helper for fetching data, client-side only
-function useQuery(store, fieldName, fetchFn) {
+// Hook for refetching by timer on client side.
+// Illustrates that we still might need to trigger fetching in response to user actions or other events.
+function useRefetchingQuery(store, fieldName, fetchFn) {
     // Helper for forcing component update.
     const forceUpdate = useForceUpdate();
 
-    // Client-side only.
-    // If no data, fetch it and force component update to display it.
     useEffect(() => {
-        if (!store[fieldName]) {
-            fetchFn.then((data) => {
-                store[fieldName] = data;
-                forceUpdate();
+        const cancelled = false;
+
+        const timeoutId = window.setTimeout(() => {
+            fetchFn().then((data) => {
+                if (!cancelled) {
+                    store[fieldName] = data;
+                    forceUpdate();
+                }
             });
-        }
-    });
+        }, 10000);
+
+        return () => {
+            window.clearTimeout(timeoutId);
+            cancelled = true;
+        };
+    }, []);
 
     return store[fieldName];
 }
@@ -153,7 +179,7 @@ function useQuery(store, fieldName, fetchFn) {
 
 ## Fetching start time
 
-As you can see, Fetch-Then-Render allows fetching to be started earlier, because the request doesn't wait for render to kick it off (hence the name).
+As you can see, Fetch-Then-Render allows fetching to be started earlier, because the request doesn't wait for render to kick it off.
 
 ## Fetching waterfalls
 
@@ -171,6 +197,18 @@ In case of Fetch-Then-Render, it's not a problem. Since the requests are central
 
 Fetch-on-Render, however, forces us to render the app an unknown number of times. The idea is to render the app, wait for started requests and repeat until there are no more promises to wait for. If it sounds inefficient and non-production-ready, don't you worry: it's exactly what Apollo [does](https://github.com/apollographql/apollo-client/blob/da4e9b95dcf11328cc568a5518151fb80de8f8df/src/react/ssr/getDataFromTree.ts#L52).
 
-## Isomorphism
+With React 18 Suspense for Data Fetching either approach will result in single render. Fetch-Then-Render will be transformed into Render-as-You-Fetch, meaning that we won't wait for the fetching to finish before rendering. Fetch-on-Render will likely be a perfectly valid option [too](https://github.com/reactwg/react-18/discussions/35#discussioncomment-823980).
 
-It's easy to see that Fetch-on-Render is isomorphic: the `useQuery` hook hides all SSR-specific logic, and the `App` is
+## Fetching logic encapsulation
+
+Fetch-on-Render allows to encapsulate both client- and server-side code in a single hook.
+
+Fetch-Then-Render, however, forces us to split the fetching logic. There is initial fetching before render and outside of React, which can happen both server- and client-side, and there is a client-side-only fetching in response to user actions (or other events). In the latter case, the fetching is still happening before render, but it most likely resides within React.
+
+## Access to React-specific data
+
+In case of Fetch-on-Render, everything is happening inside React. It means that the fetching code has access to props (we most likely care about URL params), and we can guarantee that we're fetching the data for the right page.
+
+Fetch-Then-Render is a bit more complicated. The initial fetching happens outside of React. It means that we have to do some extra work to determine which page we're on and what the URL params are.
+
+The events-driven fetching, however, most likely resides within React and have access to props and everything else.
