@@ -2,24 +2,12 @@
 
 This is my understanding of what methods are available for server-side data fetching in React today, what their pros and cons are, how they play with client-side data fetching methods, and how they relate to upcoming Suspense for Data Fetching.
 
-## TL;DR
-
-|                                                  | Fetch-Then-Render / Render-as-You-Fetch (client-side only)                                                                                                                                                                     | Fetch-on-Render                                                                                                |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| Fetching start time                              | ✔️ Fetching is started as soon as possible.                                                                                                                                                                                    | ❌ Fetching is delayed until render.                                                                           |
-| Fetching waterfalls                              | ✔️ Waterfalls can only be created explicitly.                                                                                                                                                                                  | ❌ It's possible to accidentally create a waterfall.                                                           |
-| Number of server-side renders (without Suspense) | ✔️ Single render.                                                                                                                                                                                                              | ❌ Multiple renders required to guarantee that all data is fetched.                                            |
-| Compatibility with Suspense for Data Fetching    | ✔️The recommended approach is Render-as-You-Fetch (for client and server sides).                                                                                                                                               | ✔️Will likely be supported [too](https://github.com/reactwg/react-18/discussions/35#discussioncomment-823980). |
-| Fetching logic encapsulation                     | ❌ Fetching is split in two pieces of code: initial fetching before render, outside of React (server-side and _maybe_ client-side), and fetching in response to user actions or other events, inside React (client-side only). | ✔️ It's easy to encapsulate both client- and server-side code in a single hook.                                |
-| Access to React-specific data                    | ❌ Initial fetching is done outside of React. There is no access to props, so there has to be a separate URL parser, for example.                                                                                              | ✔️ Since fetching is always done during render, there is access to props and everything else.                  |
-| Used by                                          | Next.js.                                                                                                                                                                                                                       | Apollo.                                                                                                        |
-
-## Introduction
+## The methods
 
 In React, there are the following fetching strategies:
 
 -   Fetch-on-Render: fetching is a result of render. On server side, fetching is triggered at the render phase, because side effects are ignored. On client side, it's better to trigger fetching asynchronously _after_ the render phase via the `useEffect` hook. This way, fetching can be started without blocking rendering.
--   Fetch-Then-Render: trigger fetching, wait for its completion, and only then start rendering. This way, when a component renders, it's data is already there.
+-   Fetch-Then-Render: trigger fetching, wait for its completion, and only then start rendering. This way, when a component renders, it's data is already there. We can either delay the (initial) render of the whole app, or the render of some part of the app, most likely a page content. In the latter case, the page component can actually use a different method, like Fetch-on-Render, to prepare data for its content.
 -   Render-as-You-Fetch: basically the same as Fetch-Then-Render, but we start rendering while fetching is still in progress. This method is ideal for Suspense for Data Fetching, but, from my understanding, it can be used without Suspense as well. Render-as-You-Fetch is practically useless on server side without Suspense, because, as of React 17, the render phase is synchronous, and it's more efficient to wait for the data first (Fetch-Then-Render). However, on client side, Render-as-You-Fetch may be better for UX, because it's possible to show a component in a loading state instead of a plain preloader above it (it's unclear how to achieve this using Suspense).
 
 It goes without saying that fetching strategies can differ between client and server environments. For instance, consider React Query in conjunction with Next.js. On server side, Fetch-Then-Render is used, because that's how Next.js operates. On client side, Fetch-on-Render is used, because that's how React Query works. Additionally, on client side, React Query allows starting fetching early via [Prefetching](https://react-query.tanstack.com/guides/prefetching), which basically enables the Render-as-You-Fetch method even without Suspense.
@@ -177,11 +165,13 @@ function useRefetchingQuery(store, fieldName, fetchFn) {
 }
 ```
 
-## Fetching start time
+## Fetch-on-Render vs Fetch-Then-Render
+
+### Fetching start time
 
 As you can see, Fetch-Then-Render allows fetching to be started earlier, because the request doesn't wait for render to kick it off.
 
-## Fetching waterfalls
+### Fetching waterfalls
 
 Fetching waterfalls are situations where requests are unintentionally made sequential, while they should have been parallelized.
 
@@ -189,7 +179,7 @@ Fetch-on-Render makes it easy to create such waterfalls, because the requests ar
 
 Fetch-Then-Render, on the other side, forces the requests to be centralized (most likely on a per-page basis), thereby decreasing the risk of creating these waterfalls.
 
-## Number of server-side renders
+### Number of server-side renders
 
 As of React 17, the app can only be rendered synchronously.
 
@@ -199,16 +189,36 @@ Fetch-on-Render, however, forces us to render the app an unknown number of times
 
 With React 18 Suspense for Data Fetching either approach will result in single render. Fetch-Then-Render will be transformed into Render-as-You-Fetch, meaning that we won't wait for the fetching to finish before rendering. Fetch-on-Render will likely be a perfectly valid option [too](https://github.com/reactwg/react-18/discussions/35#discussioncomment-823980).
 
-## Fetching logic encapsulation
+### Fetching logic encapsulation
 
 Fetch-on-Render allows to encapsulate both client- and server-side code in a single hook.
 
 Fetch-Then-Render, however, forces us to split the fetching logic. There is initial fetching before render and outside of React, which can happen both server- and client-side, and there is a client-side-only fetching in response to user actions (or other events). In the latter case, the fetching is still happening before render, but it most likely resides within React.
 
-## Access to React-specific data
+### Access to React-specific data
 
 In case of Fetch-on-Render, everything is happening inside React. It means that the fetching code has access to props (we most likely care about URL params), and we can guarantee that we're fetching the data for the right page.
 
 Fetch-Then-Render is a bit more complicated. The initial fetching happens outside of React. It means that we have to do some extra work to determine which page we're on and what the URL params are.
 
 The events-driven fetching, however, most likely resides within React and have access to props and everything else.
+
+## To summarize
+
+### Render methods comparison
+
+|                                                  | Fetch-Then-Render / Render-as-You-Fetch                                                                                                                                                                                        | Fetch-on-Render                                                                                                |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Fetching start time                              | ✔️ Fetching is started as soon as possible.                                                                                                                                                                                    | ❌ Fetching is delayed until render.                                                                           |
+| Fetching waterfalls                              | ✔️ Waterfalls can only be created explicitly.                                                                                                                                                                                  | ❌ It's possible to accidentally create a waterfall.                                                           |
+| Number of server-side renders (without Suspense) | ✔️ Single render (Render-as-You-Fetch is useless in this case and shouldn't be used).                                                                                                                                          | ❌ Multiple renders required to guarantee that all data is fetched.                                            |
+| Compatibility with Suspense for Data Fetching    | ✔️The recommended approach is Render-as-You-Fetch (for client and server sides). Fetch-Then-Render shouldn't be used.                                                                                                          | ✔️Will likely be supported [too](https://github.com/reactwg/react-18/discussions/35#discussioncomment-823980). |
+| Fetching logic encapsulation                     | ❌ Fetching is split in two pieces of code: initial fetching before render, outside of React (server-side and _maybe_ client-side), and fetching in response to user actions or other events, inside React (client-side only). | ✔️ It's easy to encapsulate both client- and server-side code in a single hook.                                |
+| Access to React-specific data                    | ❌ Initial fetching is done outside of React. There is no access to props, so there has to be a separate URL parser, for example.                                                                                              | ✔️ Since fetching is always done during render, there is access to props and everything else.                  |
+
+### What methods libraries use
+
+|        | Fetch-Then-Render                                                                                                                                                                 | Render-as-You-Fetch                                                                                                                                                                                             | Fetch-on-Render      |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| Client | Apollo (code organization), React Query (code organization). It's possible to move all page queries to the page component and render the page content only when all data arrives. | Apollo (optional [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data)), React Query (optional [Prefetching](https://react-query.tanstack.com/guides/prefetching)). | Apollo, React Query. |
+| Server | Next.js.                                                                                                                                                                          | Fetch-Then-Render yields the same result more efficiently.                                                                                                                                                      | Apollo.              |
