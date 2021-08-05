@@ -10,7 +10,15 @@ In React, there are the following fetching strategies:
 -   **Fetch-Then-Render**: we start fetching before render, wait for its completion and start render. We can either delay the (initial) render of the whole app, or the render of its part, most likely a page content. In the latter case, the page component can actually use a different method, like **Fetch-on-Render**, to prepare data for its content.
 -   **Render-as-You-Fetch**: we start fetching and then, _not necessarily after its completion_, we start render. In a sense, **Fetch-Then-Render** is a special case of **Render-as-You-Fetch**.
 
-It goes without saying that fetching strategies can differ between client and server environments, and even between different application parts. For instance, consider React Query in conjunction with Next.js. On server side, **Fetch-Then-Render** is used, because that's how Next.js operates (and React Query is unopinionated about SSR). On client side, **Fetch-on-Render** is used, because that's how React Query works. Additionally, on client side, React Query allows starting fetching early via [Prefetching](https://react-query.tanstack.com/guides/prefetching), which basically enables the **Render-as-You-Fetch** method even without Suspense. Finally, on client side, it's possible to move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method.
+It goes without saying that fetching strategies can differ between client and server environments, and even between different application parts. For instance, consider React Query in conjunction with Next.js.
+
+On server side, **Fetch-Then-Render** is used, because that's how Next.js operates (and React Query is unopinionated about SSR).
+
+On client side, **Fetch-on-Render** is used, because that's how React Query works.
+
+Additionally, on client side, React Query allows starting fetching early via [Prefetching](https://react-query.tanstack.com/guides/prefetching), which basically enables the **Render-as-You-Fetch** method even without Suspense.
+
+Finally, on client side, it's possible to move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method.
 
 ### Server-side specifics
 
