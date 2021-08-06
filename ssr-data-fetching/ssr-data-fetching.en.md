@@ -7,22 +7,20 @@ This is my understanding of what methods are available for server-side data fetc
 In React, there are the following fetching strategies:
 
 -   **Fetch-on-Render**: we start render, which starts fetching at some point.
--   **Fetch-Then-Render**: we start fetching before render, wait for its completion and start render. We can either delay the (initial) render of the whole app, or the render of its part, most likely a page content. In the latter case, the page component can actually use a different method, like **Fetch-on-Render**, to prepare data for its content.
+-   **Fetch-Then-Render**: we start fetching before render, wait for its completion and start render.
 -   **Render-as-You-Fetch**: we start fetching and then, _not necessarily after its completion_, we start render. In a sense, **Fetch-Then-Render** is a special case of **Render-as-You-Fetch**.
 
-It goes without saying that fetching strategies can differ between client and server environments, and even between different application parts. For instance, consider React Query in conjunction with Next.js.
+It goes without saying that fetching strategies can differ between client and server environments, and even between different application parts. For instance, consider how [Apollo](https://www.apollographql.com/) works.
 
-On server side, **Fetch-Then-Render** is used, because that's how Next.js operates (and React Query is unopinionated about SSR).
+On server side, if we use [`getDataFromTree`](https://www.apollographql.com/docs/react/api/react/ssr/#getdatafromtree), we get **Fetch-on-Render**, because we render the app to trigger fetching. Or we can use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) instead and get either **Fetch-Then-Render** or **Render-as-You-Fetch**, depending on when we start render.
 
-On client side, **Fetch-on-Render** is used, because that's how React Query works.
+On client side, we get **Fetch-on-Render** by default, because that's how the [`useQuery`](https://www.apollographql.com/docs/react/api/react/hooks/#usequery) hook works. We can also use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) and essentially get **Render-as-You-Fetch**.
 
-Additionally, on client side, React Query allows starting fetching early via [Prefetching](https://react-query.tanstack.com/guides/prefetching), which basically enables the **Render-as-You-Fetch** method even without Suspense.
-
-Finally, on client side, it's possible to move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method.
+Finally, on client side, it's possible to move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method (though the page component itself will use either **Fetch-on-Render** or **Render-as-You-Fetch**). Sure enough, you can also delay the initial app render and get pure **Fetch-Then-Render**, if you feel creative.
 
 ### Server-side specifics
 
--   **Fetch-on-Render** is not very convenient. We have to render at least twice: once to kick off fetching, and then again to actually render the app with data.
+-   **Fetch-on-Render** is not very convenient. We have to render at least twice: once to kick fetching off, and then again to actually render the app with data.
 -   **Fetch-Then-Render** is very straightforward: just fetch the data and render it, nice and tidy.
 -   **Render-as-You-Fetch** is essentially useless, because we render at least twice, and the first render doesn't do anything. It's better to use **Fetch-Then-Render** instead.
 
@@ -335,8 +333,6 @@ The events-driven fetching, however, most likely resides within React and have a
 
 ## To summarize
 
-### Render methods comparison
-
 |                                                  | Fetch-on-Render                                                  | Fetch-Then-Render                                                                                           | Render-as-You-Fetch                                                                  |
 | ------------------------------------------------ | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | Fetching start time                              | ❌ Fetching is delayed until render.                             | ✔️ Fetching is started as soon as possible.                                                                 | ✔️ Fetching is started as soon as possible                                           |
@@ -345,10 +341,3 @@ The events-driven fetching, however, most likely resides within React and have a
 | Compatibility with Suspense for Data Fetching    | ✔️Less efficient, but more convenient and perfectly valid.       | ❌ It's completely replaced by **Render-as-You-Fetch**.                                                     | ✔️It's the recommended approach.                                                     |
 | Fetching logic encapsulation                     | ✔️ It's easy to encapsulate all fetching logic in a single hook. | ❌ Fetching logic is split into initial fetching and fetching in response to events.                        | ❌ Fetching logic is split into initial fetching and fetching in response to events. |
 | Access to React-specific data                    | ✔️ Fetching is always done inside React.                         | ❌ Initial fetching is done outside of React.                                                               | ❌ Initial fetching is done outside of React.                                        |
-
-### What methods libraries use
-
-|        | Fetch-on-Render                                | Fetch-Then-Render                                                                                                                                                                 | Render-as-You-Fetch                                                                                                                                                                                             |
-| ------ | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client | Apollo (by default), React Query (by default). | Apollo (code organization), React Query (code organization). It's possible to move all page queries to the page component and render the page content only when all data arrives. | Apollo (optional [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data)), React Query (optional [Prefetching](https://react-query.tanstack.com/guides/prefetching)). |
-| Server | Apollo (`getDataFromTree`).                    | Next.js, Apollo (if you choose to manually execute queries during SSR).                                                                                                           | N/A.                                                                                                                                                                                                            |
