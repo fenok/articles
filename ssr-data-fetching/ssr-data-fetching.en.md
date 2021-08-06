@@ -325,6 +325,8 @@ With Suspense, **Fetch-Then-Render** will be completely replaced by **Render-as-
 
 Thanks to asynchronous rendering, either method will result in a single render in any environment (we're not counting intermediate rerenders of suspended components).
 
+All other mentioned pros and cons will remain the same.
+
 ## To summarize
 
 |                                                  | Fetch-on-Render                                                  | Fetch-Then-Render                                                                                           | Render-as-You-Fetch                                                                  |
