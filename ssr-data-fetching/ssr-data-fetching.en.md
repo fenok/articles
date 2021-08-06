@@ -18,12 +18,6 @@ On client side, we get **Fetch-on-Render** by default, because that's how the [`
 
 Finally, on client side, it's possible to move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method (though the page component itself will use either **Fetch-on-Render** or **Render-as-You-Fetch**). Sure enough, you can also delay the initial app render and get pure **Fetch-Then-Render**, if you feel creative.
 
-### Server-side specifics
-
--   **Fetch-on-Render** is not very convenient. We have to render at least twice: once to kick fetching off, and then again to actually render the app with data.
--   **Fetch-Then-Render** is very straightforward: just fetch the data and render it, nice and tidy.
--   **Render-as-You-Fetch** is essentially useless, because we render at least twice, and the first render doesn't do anything. It's better to use **Fetch-Then-Render** instead.
-
 ### Suspense for Data Fetching
 
 As of React 17, the render phase is synchronous. React 18 will support Suspense for Data Fetching, which will be based on _asynchronous_ rendering.
@@ -313,7 +307,7 @@ As of React 17, the app can only be rendered synchronously.
 
 In case of **Fetch-Then-Render**, it's not a problem. Since the requests are centralized, we can simply wait for them all and then render the app only once.
 
-**Fetch-on-Render**, however, forces us to render the app an unknown number of times. The idea is to render the app, wait for started requests and repeat until there are no more promises to wait for. If it sounds inefficient and non-production-ready, don't you worry: it's exactly what Apollo [does](https://github.com/apollographql/apollo-client/blob/da4e9b95dcf11328cc568a5518151fb80de8f8df/src/react/ssr/getDataFromTree.ts#L52).
+**Fetch-on-Render**, however, forces us to render the app _at least_ two times. The idea is to render the app, wait for started requests and repeat until there are no more promises to wait for. If it sounds inefficient and non-production-ready, don't you worry: it's exactly what Apollo [does](https://github.com/apollographql/apollo-client/blob/da4e9b95dcf11328cc568a5518151fb80de8f8df/src/react/ssr/getDataFromTree.ts#L52).
 
 **Render-as-You-Fetch** is the same as **Fetch-Then-Render**, but less efficient (it requires two renders, one of which is useless).
 
