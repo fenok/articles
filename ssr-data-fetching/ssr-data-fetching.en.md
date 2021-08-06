@@ -1,8 +1,8 @@
-# Server-Side Data Fetching in React
+# Client- and Server-Side Data Fetching in React
 
-This is my understanding of what methods are available for server-side data fetching in React today, what their pros and cons are, how they play with client-side data fetching methods, and how they relate to upcoming Suspense for Data Fetching.
+This is my understanding of what methods are available for client- and server-side data fetching in React 17, what their pros and cons are, and how they will change because of upcoming Suspense for Data Fetching in React 18.
 
-## The methods
+## So how do we fetch?
 
 In React, there are the following fetching strategies:
 
@@ -18,7 +18,7 @@ On client side, we get **Fetch-on-Render** by default, because that's how the [`
 
 Finally, on client side, it's possible to move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method (though the page component itself will use either **Fetch-on-Render** or **Render-as-You-Fetch**). Sure enough, you can also use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) and delay the initial app render to get pure **Fetch-Then-Render**, if you feel creative.
 
-## Examples
+## Show me the code!
 
 The following examples give a rough idea of what the fetching methods look like both on server and client sides (as of React 17).
 
@@ -315,7 +315,7 @@ In case of **Fetch-on-Render**, everything is happening inside React. It means t
 
 The events-driven fetching, however, most likely resides within React and have access to props and everything else.
 
-## Suspense for Data Fetching
+## What will change in React 18?
 
 As of React 17, the render phase is synchronous. React 18 will support Suspense for Data Fetching, which will be based on _asynchronous_ rendering.
 
