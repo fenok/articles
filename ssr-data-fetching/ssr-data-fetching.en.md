@@ -16,7 +16,7 @@ On server side, if we use [`getDataFromTree`](https://www.apollographql.com/docs
 
 On client side, we get **Fetch-on-Render** by default, because that's how the [`useQuery`](https://www.apollographql.com/docs/react/api/react/hooks/#usequery) hook works. We can also use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) and essentially get **Render-as-You-Fetch**.
 
-Finally, on client side, it's possible to move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method (though the page component itself will use either **Fetch-on-Render** or **Render-as-You-Fetch**). Sure enough, you can also delay the initial app render and get pure **Fetch-Then-Render**, if you feel creative.
+Finally, on client side, it's possible to move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method (though the page component itself will use either **Fetch-on-Render** or **Render-as-You-Fetch**). Sure enough, you can also use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) and delay the initial app render to get pure **Fetch-Then-Render**, if you feel creative.
 
 ## Examples
 
