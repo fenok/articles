@@ -18,16 +18,6 @@ On client side, we get **Fetch-on-Render** by default, because that's how the [`
 
 Finally, on client side, it's possible to move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method (though the page component itself will use either **Fetch-on-Render** or **Render-as-You-Fetch**). Sure enough, you can also delay the initial app render and get pure **Fetch-Then-Render**, if you feel creative.
 
-### Suspense for Data Fetching
-
-As of React 17, the render phase is synchronous. React 18 will support Suspense for Data Fetching, which will be based on _asynchronous_ rendering.
-
-With Suspense, **Fetch-Then-Render** will be completely replaced by **Render-as-You-Fetch**, which will work equally well on both server and client sides.
-
-**Fetch-on-Render** will also be [available](https://github.com/reactwg/react-18/discussions/35#discussioncomment-823980) as a more convenient (though less efficient) alternative.
-
-Thanks to asynchronous rendering, either method will result in a single render in any environment (we're not counting intermediate rerenders of suspended components).
-
 ## Examples
 
 The following examples give a rough idea of what the fetching methods look like both on server and client sides (as of React 17).
@@ -324,6 +314,16 @@ In case of **Fetch-on-Render**, everything is happening inside React. It means t
 **Fetch-Then-Render**, as well as **Render-as-You-Fetch**, is a bit more complicated. The initial fetching happens outside of React. It means that we have to do some extra work to determine which page we're on and what the URL params are.
 
 The events-driven fetching, however, most likely resides within React and have access to props and everything else.
+
+## Suspense for Data Fetching
+
+As of React 17, the render phase is synchronous. React 18 will support Suspense for Data Fetching, which will be based on _asynchronous_ rendering.
+
+With Suspense, **Fetch-Then-Render** will be completely replaced by **Render-as-You-Fetch**, which will work equally well on both server and client sides.
+
+**Fetch-on-Render** will also be [available](https://github.com/reactwg/react-18/discussions/35#discussioncomment-823980) as a more convenient (though less efficient) alternative.
+
+Thanks to asynchronous rendering, either method will result in a single render in any environment (we're not counting intermediate rerenders of suspended components).
 
 ## To summarize
 
