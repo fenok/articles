@@ -2,7 +2,7 @@
 
 # Client- and Server-Side Data Fetching in React
 
-This is my understanding of what methods are available for client- and server-side data fetching in React 17, what their pros and cons are, and how they will change because of upcoming [Suspense for Data Fetching](https://reactjs.org/docs/concurrent-mode-suspense.html) in React 18.
+This is an overview of what methods are available for client- and server-side data fetching in React 17, what their pros and cons are, and how upcoming [Suspense for Data Fetching](https://reactjs.org/docs/concurrent-mode-suspense.html) will change them.
 
 ## So how do we fetch?
 
@@ -10,7 +10,7 @@ In React, there are the following fetching strategies:
 
 -   **Fetch-on-Render**: fetching is triggered by render.
 -   **Fetch-Then-Render**: we start fetching first and render only after its completion.
--   **Render-as-You-Fetch**: we start fetching and then, _not necessarily after its completion_, we render. In a sense, **Fetch-Then-Render** is a special case of **Render-as-You-Fetch**.
+-   **Render-as-You-Fetch**: we start fetching, and then, _not necessarily after its completion_, we render. In a sense, **Fetch-Then-Render** is a special case of **Render-as-You-Fetch**.
 
 It goes without saying that fetching strategies can differ between client and server environments, and even between different application parts. For instance, consider how [Apollo](https://www.apollographql.com/) works.
 
@@ -18,11 +18,11 @@ On server side, if we use [`getDataFromTree`](https://www.apollographql.com/docs
 
 On client side, we get **Fetch-on-Render** by default, because that's how the [`useQuery`](https://www.apollographql.com/docs/react/api/react/hooks/#usequery) hook works. We can also use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) and essentially get **Render-as-You-Fetch**.
 
-Finally, on client side, it's possible to move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method (though the page component itself will use either **Fetch-on-Render** or **Render-as-You-Fetch**). Sure enough, you can also use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) and delay the initial app render to get pure **Fetch-Then-Render**, if you feel creative.
+Finally, on client side, we can move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method (though the page component itself will use either **Fetch-on-Render** or **Render-as-You-Fetch**). Sure enough, we can also use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) and delay the initial app render to get pure **Fetch-Then-Render**, but it's not very useful.
 
 ## Show me the code!
 
-The following examples give a rough idea of what the fetching methods look like both on server and client sides (as of React 17).
+The following examples give a rough idea of what the fetching methods look like on both server and client sides (as of React 17).
 
 ### Fetch-on-Render
 
@@ -80,9 +80,9 @@ const App = ({ store }) => {
     );
 };
 
-/** Hook for all fetching logic. */
+/** A hook for all fetching logic. */
 function useQuery(store, fieldName, fetchFn) {
-    /** Server-side only helper from the getDataFromTree utility. */
+    /** Server-side-only helper from the getDataFromTree utility. */
     const ssrManager = useSsrManager();
 
     /**
@@ -107,7 +107,7 @@ function useQuery(store, fieldName, fetchFn) {
         }
     });
 
-    /** Subscribe to the store part. */
+    /** Subscribe to a store part. */
     const data = useStoreValue(store, fieldName);
 
     const refetch = () =>
@@ -174,7 +174,7 @@ const App = ({ store }) => {
     );
 };
 
-/** Function for initial fetching. */
+/** A function for initial fetching. */
 App.prefetch = async (store) => {
     if (!store.has("user")) {
         /** We explicitly prefetch some data. */
@@ -184,9 +184,9 @@ App.prefetch = async (store) => {
     return store;
 };
 
-/** Hook for fetching in response to user action. */
+/** A hook for fetching in response to a user action. */
 function useQuery(store, fieldName, fetchFn) {
-    /** Subscribe to the store part. */
+    /** Subscribe to a store part. */
     const data = useStoreValue(store, fieldName);
 
     const refetch = () =>
@@ -211,7 +211,7 @@ async function ssrMiddleware(_, res) {
     if (process.env.PREFETCH) {
         const prefetchPromise = App.prefetch(store);
 
-        /** We "render-as-we-fetch", but it's completely useless */
+        /** We "render-as-we-fetch", but it's completely useless. */
         renderToString(app);
 
         await prefetchPromise;
@@ -255,7 +255,7 @@ const App = ({ store }) => {
     );
 };
 
-/** Function for initial fetching. */
+/** A function for initial fetching. */
 App.prefetch = async (store) => {
     if (!store.has("user")) {
         /** We explicitly prefetch some data. */
@@ -265,9 +265,9 @@ App.prefetch = async (store) => {
     return store;
 };
 
-/** Hook for fetching in response to user action. */
+/** A hook for fetching in response to a user action. */
 function useQuery(store, fieldName, fetchFn) {
-    /** Subscribe to the store part. */
+    /** Subscribe to a store part. */
     const data = useStoreValue(store, fieldName);
 
     const refetch = () =>
@@ -281,7 +281,7 @@ function useQuery(store, fieldName, fetchFn) {
 
 ### Fetching start time
 
-As you can see, **Fetch-Then-Render** and **Render-as-You-Fetch** allow fetching to be started earlier, because the request doesn't wait for render to kick it off.
+As you can see, **Fetch-Then-Render** and **Render-as-You-Fetch** allow fetching to be started earlier, because the requests don't wait for render to kick them off.
 
 ### Rendering without data
 
@@ -295,7 +295,7 @@ Fetching waterfalls are situations where requests are unintentionally made seque
 
 **Fetch-on-Render** makes it easy to create such waterfalls, because the requests are decentralized. Some parent can fetch its data, then pass this data to its newly-rendered child, which itself can trigger a request that doesn't use the passed data at all, and viola: we got ourselves a waterfall.
 
-**Fetch-Then-Render**, on the other side, forces the requests to be centralized (most likely on a per-page basis), thereby decreasing the risk of creating these waterfalls. However, if we group all requests into a single promise, we still wait for all requests to complete before we can start render, which is not ideal.
+**Fetch-Then-Render**, on the other side, forces the requests to be centralized (most likely on a per-page basis), thereby eliminating the risk of creating these waterfalls. However, if we group all requests into a single promise, we still wait for all of them to complete before we can render, which is not ideal.
 
 **Render-as-You-Fetch** also forces the requests to be centralized, but, since render is not delayed, we can show pieces of data as they arrive.
 
