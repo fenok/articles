@@ -1,6 +1,6 @@
 # Client- and Server-Side Data Fetching in React
 
-This is my understanding of what methods are available for client- and server-side data fetching in React 17, what their pros and cons are, and how they will change because of upcoming Suspense for Data Fetching in React 18.
+This is my understanding of what methods are available for client- and server-side data fetching in React 17, what their pros and cons are, and how they will change because of upcoming [Suspense for Data Fetching](https://reactjs.org/docs/concurrent-mode-suspense.html) in React 18.
 
 ## So how do we fetch?
 
@@ -323,7 +323,7 @@ The events-driven fetching, however, most likely resides within React and have a
 
 ## What will change in React 18?
 
-React 18 will support Suspense for Data Fetching.
+React 18 will support [Suspense for Data Fetching](https://reactjs.org/docs/concurrent-mode-suspense.html).
 
 With the [recommended API](https://github.com/reactwg/react-18/discussions/22#discussion-3385743), either method will result in a single render on server side (in a sense that we won't throw away previously rendered parts). We will render a component only if its data is ready, because if it's not, the component will suspend, and we will continue rendering when the data is ready.
 
