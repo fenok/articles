@@ -299,7 +299,7 @@ Fetching waterfalls are situations where requests are unintentionally made seque
 
 ### Number of server-side renders
 
-As of React 17, the app can only be rendered synchronously.
+As of React 17, we can't wait for data during render.
 
 In case of **Fetch-Then-Render**, it's not a problem. Since the requests are centralized, we can simply wait for them all and then render the app only once.
 
@@ -323,9 +323,9 @@ The events-driven fetching, however, most likely resides within React and have a
 
 ## What will change in React 18?
 
-As of React 17, the render phase is synchronous. React 18 will support Suspense for Data Fetching, which will be based on _asynchronous_ rendering.
+React 18 will support Suspense for Data Fetching.
 
-Thanks to asynchronous rendering, either method will result in a single render in any environment. We will render a component only if its data is ready, because if it's not, the component will suspend, and we will continue rendering when the data is ready.
+With the [recommended API](https://github.com/reactwg/react-18/discussions/22#discussion-3385743), either method will result in a single render on server side (in a sense that we won't throw away previously rendered parts). We will render a component only if its data is ready, because if it's not, the component will suspend, and we will continue rendering when the data is ready.
 
 All other mentioned pros and cons will remain the same.
 
