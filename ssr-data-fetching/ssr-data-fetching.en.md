@@ -6,9 +6,9 @@ This is my understanding of what methods are available for client- and server-si
 
 In React, there are the following fetching strategies:
 
--   **Fetch-on-Render**: we start render, which starts fetching at some point.
--   **Fetch-Then-Render**: we start fetching before render, wait for its completion and start render.
--   **Render-as-You-Fetch**: we start fetching and then, _not necessarily after its completion_, we start render. In a sense, **Fetch-Then-Render** is a special case of **Render-as-You-Fetch**.
+-   **Fetch-on-Render**: fetching is triggered by render.
+-   **Fetch-Then-Render**: we start fetching first and render only after its completion.
+-   **Render-as-You-Fetch**: we start fetching and then, _not necessarily after its completion_, we render. In a sense, **Fetch-Then-Render** is a special case of **Render-as-You-Fetch**.
 
 It goes without saying that fetching strategies can differ between client and server environments, and even between different application parts. For instance, consider how [Apollo](https://www.apollographql.com/) works.
 
@@ -209,7 +209,7 @@ async function ssrMiddleware(_, res) {
     if (process.env.PREFETCH) {
         const prefetchPromise = App.prefetch(store);
 
-        /** We 'render-as-we-fetch', but it's completely useless */
+        /** We "render-as-we-fetch", but it's completely useless */
         renderToString(app);
 
         await prefetchPromise;
@@ -283,9 +283,9 @@ As you can see, **Fetch-Then-Render** and **Render-as-You-Fetch** allow fetching
 
 ### Rendering without data
 
-**Fetch-Then-Render** is simple: the component can't be rendered without its data.
+**Fetch-Then-Render** is simple: a component can't be rendered without its data.
 
-However, if we use **Fetch-on-Render** or **Render-as-You-Fetch**, the component can be rendered without its data, so it has to care about showing some loading state.
+However, if we use **Fetch-on-Render** or **Render-as-You-Fetch**, a component can be rendered without its data, so it has to care about showing some "no-data" state.
 
 ### Fetching waterfalls
 
@@ -329,18 +329,20 @@ Thanks to asynchronous rendering, either method will result in a single render i
 
 All other mentioned pros and cons will remain the same.
 
-With Suspense, **Fetch-Then-Render** will be completely replaced by **Render-as-You-Fetch**, which will work equally well on both server and client sides.
+As you can see, **Render-as-You-Fetch** will work equally well on both server and client sides, and it will completely replace **Fetch-Then-Render**, because the latter just won't have any advantages left.
 
 **Fetch-on-Render** will also be [available](https://github.com/reactwg/react-18/discussions/35#discussioncomment-823980) as a more convenient (though less efficient) alternative.
 
 ## To summarize
 
-|                                               | Fetch-on-Render                                                  | Fetch-Then-Render                                                                                           | Render-as-You-Fetch                                                                  |
-| --------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Fetching start time                           | ❌ Fetching is delayed until render.                             | ✔️ Fetching is started as soon as possible.                                                                 | ✔️ Fetching is started as soon as possible                                           |
-| Rendering without data (no Suspense)          | ❌ A component can be rendered without its data.                 | ✔️ A component can only be rendered with its data.                                                          | ❌ A component can be rendered without its data.                                     |
-| Fetching waterfalls                           | ❌ It's possible to accidentally create a waterfall.             | ✔️❌ No waterfalls between components, but we likely won't show any data before all requests are completed. | ✔️ Waterfalls can only be created explicitly.                                        |
-| Number of server-side renders (no Suspense)   | ❌ At least two renders.                                         | ✔️ Single render.                                                                                           | ❌ Two renders, one of which is useless.                                             |
-| Compatibility with Suspense for Data Fetching | ✔️It's less efficient, but more convenient and perfectly valid.  | ❌ It's completely replaced by **Render-as-You-Fetch**.                                                     | ✔️It's the recommended approach.                                                     |
-| Fetching logic encapsulation                  | ✔️ It's easy to encapsulate all fetching logic in a single hook. | ❌ Fetching logic is split into initial fetching and fetching in response to events.                        | ❌ Fetching logic is split into initial fetching and fetching in response to events. |
-| Access to React-specific data                 | ✔️ Fetching is always done inside React.                         | ❌ Initial fetching is done outside of React.                                                               | ❌ Initial fetching is done outside of React.                                        |
+|                                             | Fetch-on-Render                                                  | Fetch-Then-Render                                                                                           | Render-as-You-Fetch                                                                  |
+| ------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Fetching start time                         | ❌ Fetching is delayed until render.                             | ✔️ Fetching is started as soon as possible.                                                                 | ✔️ Fetching is started as soon as possible                                           |
+| Rendering without data (no Suspense)        | ❌ A component can be rendered without its data.                 | ✔️ A component can only be rendered with its data.                                                          | ❌ A component can be rendered without its data.                                     |
+| Rendering without data (Suspense)           | ✔️ Impossible.                                                   | ✔️ Impossible.                                                                                              | ✔️ Impossible.                                                                       |
+| Fetching waterfalls                         | ❌ It's possible to accidentally create a waterfall.             | ✔️❌ No waterfalls between components, but we likely won't show any data before all requests are completed. | ✔️ Waterfalls can only be created explicitly.                                        |
+| Number of server-side renders (no Suspense) | ❌ At least two renders.                                         | ✔️ A single render.                                                                                         | ❌ Two renders, one of which is useless.                                             |
+| Number of server-side renders (Suspense)    | ✔️ A single render.                                              | ✔️ A single render.                                                                                         | ✔️ A single render.                                                                  |
+| Usage with Suspense for Data Fetching       | ✔️ It's less efficient, but more convenient and perfectly valid. | ❌ It's completely replaced by **Render-as-You-Fetch**.                                                     | ✔️It's the recommended approach.                                                     |
+| Fetching logic encapsulation                | ✔️ It's easy to encapsulate all fetching logic in a single hook. | ❌ Fetching logic is split into initial fetching and fetching in response to events.                        | ❌ Fetching logic is split into initial fetching and fetching in response to events. |
+| Access to React-specific data               | ✔️ Fetching is always done inside React.                         | ❌ Initial fetching is done outside of React.                                                               | ❌ Initial fetching is done outside of React.                                        |
