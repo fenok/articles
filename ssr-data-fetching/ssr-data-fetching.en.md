@@ -1,3 +1,5 @@
+![Cover](resources/cover.png)
+
 # Client- and Server-Side Data Fetching in React
 
 This is my understanding of what methods are available for client- and server-side data fetching in React 17, what their pros and cons are, and how they will change because of upcoming [Suspense for Data Fetching](https://reactjs.org/docs/concurrent-mode-suspense.html) in React 18.
