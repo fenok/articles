@@ -12,13 +12,17 @@ In React, there are the following fetching strategies:
 -   **Fetch-Then-Render**: we start fetching first and render only after its completion.
 -   **Render-as-You-Fetch**: we start fetching, and then, _not necessarily after its completion_, we render. In a sense, **Fetch-Then-Render** is a special case of **Render-as-You-Fetch**.
 
-It goes without saying that fetching strategies can differ between client and server environments, and even between different application parts. For instance, consider how [Apollo](https://www.apollographql.com/) works.
+It goes without saying that the fetching methods can differ between client and server environments, and even between different application parts. For instance, consider how [Apollo](https://www.apollographql.com/) works.
 
 On server side, if we use [`getDataFromTree`](https://www.apollographql.com/docs/react/api/react/ssr/#getdatafromtree), we get **Fetch-on-Render**, because we render the app to trigger fetching. Or we can use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) instead and get either **Fetch-Then-Render** or **Render-as-You-Fetch**, depending on when we start render.
 
 On client side, we get **Fetch-on-Render** by default, because that's how the [`useQuery`](https://www.apollographql.com/docs/react/api/react/hooks/#usequery) hook works. We can also use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) and essentially get **Render-as-You-Fetch**.
 
-Finally, on client side, we can move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method (though the page component itself will use either **Fetch-on-Render** or **Render-as-You-Fetch**). Sure enough, we can also use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) and delay the initial app render to get pure **Fetch-Then-Render**, but it's not very useful.
+Finally, on client side, we can delay the initial app render until [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) is complete to get **Fetch-Then-Render**, but it's likely not a very good idea.
+
+In fact, we can mix the fetching methods. For instance, on client side, we can move all page queries to the page component and render the page content only when all data arrives. This way, the page content will effectively use the **Fetch-Then-Render** method, though the page component itself will use either **Fetch-on-Render** or **Render-as-You-Fetch**.
+
+Throughout the article, we will focus on "pure" forms of the fetching methods.
 
 ## Show me the code!
 
