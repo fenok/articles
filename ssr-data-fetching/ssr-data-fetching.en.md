@@ -9,8 +9,8 @@ This is an overview of what methods are available for client- and server-side da
 In React, there are the following fetching strategies:
 
 -   **Fetch-on-Render**: fetching is triggered by render.
--   **Fetch-Then-Render**: we start fetching first and render only after its completion.
--   **Render-as-You-Fetch**: we start fetching, and then, _not necessarily after its completion_, we render. In a sense, **Fetch-Then-Render** is a special case of **Render-as-You-Fetch**.
+-   **Fetch-Then-Render**: we start fetching as early as possible and render only when the data is ready.
+-   **Render-as-You-Fetch**: we start fetching as early as possible and start rendering _immediately_ (not necessarily when the data is ready). In a sense, **Fetch-Then-Render** is a special case of **Render-as-You-Fetch**.
 
 It goes without saying that the fetching methods can differ between client and server environments, and even between different application parts. For instance, consider how [Apollo](https://www.apollographql.com/) works.
 
