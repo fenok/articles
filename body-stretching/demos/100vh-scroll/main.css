@@ -5,8 +5,8 @@
 body {
     min-height: 100vh;
 
-    border: 30px solid #FFEDE1;
-    background: #AFCBFF;
+    border: 30px solid #ffede1;
+    background: #afcbff;
     box-sizing: border-box;
 
     display: flex;
