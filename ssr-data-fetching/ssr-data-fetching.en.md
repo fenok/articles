@@ -16,7 +16,7 @@ It goes without saying that the fetching approaches can differ between client an
 
 On the server side, if we use [`getDataFromTree`](https://www.apollographql.com/docs/react/api/react/ssr/#getdatafromtree), we implement **Fetch-on-Render**, because we render the app to trigger fetching. Or, we can use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) instead and get either **Fetch-Then-Render** or **Render-as-You-Fetch**, depending on when we start rendering.
 
-On the client side, **Fetch-on-Render** is a default approach, because that's how the [`useQuery`](https://www.apollographql.com/docs/react/api/react/hooks/#usequery) hook works. We can also use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) and essentially get **Render-as-You-Fetch**.
+On the client side, **Fetch-on-Render** is the default approach, because that's how the [`useQuery`](https://www.apollographql.com/docs/react/api/react/hooks/#usequery) hook works. We can also use [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) and essentially get **Render-as-You-Fetch**.
 
 Finally, on the client side, we can delay the initial render until [Prefetching](https://www.apollographql.com/docs/react/performance/performance/#prefetching-data) is complete to implement **Fetch-Then-Render**, but it's likely not a very good idea.
 
@@ -309,7 +309,7 @@ As of React 17, we can't wait for data during render.
 
 For **Fetch-Then-Render**, it's not a problem. Since the requests are centralized, we can simply wait for them all and then render the app only once.
 
-**Fetch-on-Render**, however, forces us to render the app _at least_ two times. The idea is to render the app, wait for all the initiated requests to complete and then repeat the process until there are no more requests to wait for. If it seems inefficient and not ready for production, don't you worry: this approach has long been [used](https://github.com/apollographql/apollo-client/blob/da4e9b95dcf11328cc568a5518151fb80de8f8df/src/react/ssr/getDataFromTree.ts#L52) by Apollo.
+**Fetch-on-Render**, however, forces us to render the app _at least_ two times. The idea is to render the app, wait for all the initiated requests to complete, and then repeat the process until there are no more requests to wait for. If it seems inefficient and not ready for production, don't you worry: this approach has long been [used](https://github.com/apollographql/apollo-client/blob/da4e9b95dcf11328cc568a5518151fb80de8f8df/src/react/ssr/getDataFromTree.ts#L52) by Apollo.
 
 **Render-as-You-Fetch** is very similar to **Fetch-Then-Render**, but slightly less efficient (it requires two renders, one of which is useless). In fact, it shouldn't be used on the server side at all.
 
@@ -317,7 +317,7 @@ For **Fetch-Then-Render**, it's not a problem. Since the requests are centralize
 
 With **Fetch-on-Render**, it's easy to encapsulate both client- and server-side code in a single hook.
 
-In contrast, **Fetch-Then-Render** and **Render-as-You-Fetch** force us to split the fetching logic. On one hand, there is the initial fetching. It occurs before render (outside of React), and it can happen on both the server and the client sides. On the other hand, there is the client-side-only fetching in response to user actions (or other events). In the latter case, the fetching still happens before render, but it most likely resides within React.
+In contrast, **Fetch-Then-Render** and **Render-as-You-Fetch** force us to split the fetching logic. On one hand, there is the initial fetching. It occurs before render (outside of React), and it can happen on both the server and the client sides. On the other hand, there is the client-side-only fetching in response to user actions (or other events), which still happens before render, but most likely resides within React.
 
 ### Access to React-specific data
 
